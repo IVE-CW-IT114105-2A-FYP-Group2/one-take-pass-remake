@@ -13,9 +13,9 @@ class OTPELearning extends StatelessWidget {
       padding: EdgeInsets.all(10),
       child: ListView(
         children: [
-          _writtenTest(),
+          _writtenTest(context),
           Padding(padding: EdgeInsets.only(top: 10, bottom: 10)),
-          _roadTest(),
+          _roadTest(context),
           Padding(padding: EdgeInsets.only(top: 10, bottom: 10)),
         ],
       ),
@@ -52,43 +52,117 @@ MaterialButton _elButton(IconData icon, String label, Function onclick) {
 }
 
 ///Entire module of written test
-Column _writtenTest() {
+Column _writtenTest(BuildContext context) {
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       _subTitle("Written Test"),
       //Text-only questions
-      _elButton(
-          FontAwesomeIcons.wordpressSimple, "Text-only Questions", () => {}),
+      _elButton(FontAwesomeIcons.wordpressSimple, "Text-only Questions", () {}),
       //End text-only question
       Padding(padding: EdgeInsets.all(10)),
       //Symbol questions
-      _elButton(FontAwesomeIcons.road, "Symbol Questions", () => {}),
+      _elButton(FontAwesomeIcons.road, "Symbol Questions", () {}),
       //End symbol questions
       Padding(padding: EdgeInsets.all(10)),
       //Combine questions
-      _elButton(FontAwesomeIcons.chartBar, "Combine Questions", () => {}),
+      _elButton(FontAwesomeIcons.chartBar, "Combine Questions", () {}),
       //End combine questions
       Padding(padding: EdgeInsets.all(10)),
       //Mock written test
-      _elButton(FontAwesomeIcons.pencilRuler, "Mock Written Test", () => {})
+      _elButton(FontAwesomeIcons.pencilRuler, "Mock Written Test", () {})
       //End mock written test
     ],
   );
 }
 
-Column _roadTest() {
+Column _roadTest(BuildContext context) {
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       _subTitle("Road Test"),
       //Driving skill videos
-      _elButton(FontAwesomeIcons.prayingHands, "Driving Skill Video", () => {}),
+      _elButton(FontAwesomeIcons.prayingHands, "Driving Skill Video", () {}),
       //End driving skill video
       Padding(padding: EdgeInsets.all(10)),
       //Road exam video
-      _elButton(FontAwesomeIcons.car, "Road Exam Video", () => {})
+      _elButton(FontAwesomeIcons.car, "Road Exam Video", () {})
       //End road exam video
     ],
   );
+}
+
+class _QuestionPage extends StatefulWidget {
+  @override
+  State<StatefulWidget> createState() => _QuestionPageUI();
+}
+
+class _QuestionPageUI extends State<_QuestionPage> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold();
+  }
+}
+
+abstract class _ReviewAnswer extends StatelessWidget {
+  Color bgColour();
+  String response();
+
+  ///Predefine style of action button
+  Container _actionBtn(
+      BuildContext context, String btnTxt, Color bg, Function onPressed) {
+    return Container(
+      margin: EdgeInsets.only(top: 25, bottom: 25),
+      width: MediaQuery.of(context).size.width - 10,
+      height: 50,
+      child: MaterialButton(
+        child:
+            Text(btnTxt, style: TextStyle(fontSize: 18, color: Colors.white)),
+        color: bg,
+        onPressed: onPressed,
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: bgColour(),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Text(
+              response(),
+              style: TextStyle(
+                  fontSize: 63,
+                  fontWeight: FontWeight.w400,
+                  color: Colors.black),
+              textAlign: TextAlign.center,
+            ),
+            Padding(padding: EdgeInsets.only(top: 100)),
+            _actionBtn(context, "Next Question", OTPColour.mainTheme, () {}),
+            _actionBtn(context, "Give Up", Colors.redAccent, () {})
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _CorrectAns extends _ReviewAnswer {
+  @override
+  Color bgColour() => OTPColour.light2;
+
+  @override
+  String response() => "Correct!";
+}
+
+class _IncorrectAns extends _ReviewAnswer {
+  @override
+  Color bgColour() => colourPicker(175, 12, 12);
+
+  @override
+  String response() => "Incorrect!";
 }

@@ -1,21 +1,12 @@
-class Questions {
-  String question;
-  List<AnswersChoice> answer;
+import 'package:flutter/widgets.dart';
+
+abstract class Question {
+  Widget questionContent();
+  List<AnswerChoice> answers;
 }
 
-class AnswersChoice {
-  String answerName;
-  bool isCorrect;
-}
-
-class QuestionsManager {
-  List<Questions> questionList;
-
-  Questions get nextQuestion {
-    try {
-      return questionList.removeAt(0);
-    } catch (ofre) {
-      return null;
-    }
-  }
+class AnswerChoice {
+  final Widget ui;
+  final bool isCorrect;
+  AnswerChoice({@required this.ui, this.isCorrect});
 }
