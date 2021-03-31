@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "668312440876",
+    "project_id": "ive-tutorial",
+    "storage_bucket": "ive-tutorial.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:668312440876:android:d8d568b54af2307f314189",
+        "android_client_info": {
+          "package_name": "com.example.one_take_pass_remake"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "668312440876-mqp3pk45vgg4bspipfo8c963d3anbihn.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD4eQI4Y6KL-M4aM3CUjLdblNB78lhxBek"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "668312440876-mqp3pk45vgg4bspipfo8c963d3anbihn.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "668312440876-cr464e214erodpg07tm17rdv9rn7n8ob.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.oneTakePassRemake"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
