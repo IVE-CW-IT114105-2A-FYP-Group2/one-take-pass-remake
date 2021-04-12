@@ -1,12 +1,13 @@
 import 'package:flutter/widgets.dart';
 
-abstract class Question {
-  Widget questionContent();
-  List<AnswerChoice> answers;
+class Question {
+  String _question;
+  List<Answer> _choice;
 }
 
-class AnswerChoice {
-  final Widget ui;
+class Answer {
   final bool isCorrect;
-  AnswerChoice({@required this.ui, this.isCorrect});
+  bool isSelected = false;
+  final String answerString;
+  Answer({@required this.answerString, @required this.isCorrect});
 }
