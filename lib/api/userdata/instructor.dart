@@ -1,20 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:one_take_pass_remake/api/userdata/behaviours.dart';
+import 'package:one_take_pass_remake/api/userdata/districts.dart';
 import 'package:one_take_pass_remake/themes.dart';
+
+//Integrated those object that required
+export 'package:one_take_pass_remake/api/userdata/behaviours.dart';
+export 'package:one_take_pass_remake/api/userdata/districts.dart';
 
 class Instructor {
   String name;
   String desc;
   double rating;
+  Personality personality;
+  SpeakingLanguage speakingLanguage;
+  HKDistrict hkDistrict;
   String avater;
 
-  Instructor(String name, String desc, double rating, [String avater = ""]) {
+  Instructor(String name, String desc, double rating, Personality personality,
+      SpeakingLanguage speakingLanguage, HKDistrict hkDistrict,
+      [String avater = ""]) {
     if (rating > 5 || rating < 0) {
       throw new RangeError("Rating range must between 0 to 5");
     }
     this.name = name;
     this.desc = desc;
     this.rating = rating;
+    this.personality = personality;
+    this.speakingLanguage = speakingLanguage;
+    this.hkDistrict = hkDistrict;
     this.avater = avater;
   }
 }

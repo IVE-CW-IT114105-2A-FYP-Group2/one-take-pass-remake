@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_login/flutter_login.dart';
 import 'package:one_take_pass_remake/pages/index.dart';
 
-const testData = const {"24567111": "castlepeakhospital", "21800000": "kfc"};
-
 class OTPLogin extends StatelessWidget {
   Duration get buffer => Duration(seconds: 5);
 
@@ -12,12 +10,6 @@ class OTPLogin extends StatelessWidget {
     Future.delayed(buffer)
         //TODO: Convert to API compatable
         .then((_) {
-      if (!testData.containsKey(lD.name)) {
-        return "Username and password unmatched!";
-      }
-      if (testData[lD.name] != lD.password) {
-        return "Username and password unmatched!";
-      }
       return null;
     });
   }
@@ -32,7 +24,7 @@ class OTPLogin extends StatelessWidget {
           Navigator.pushReplacement(
               context, MaterialPageRoute(builder: (context) => OTPIndex()));
         },
-        onRecoverPassword: (String) {},
+        onRecoverPassword: (String _) {},
         messages: LoginMessages(
           usernameHint: "Phone No.",
         ),

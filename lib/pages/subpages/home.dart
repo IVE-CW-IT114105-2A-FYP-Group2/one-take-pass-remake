@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:one_take_pass_remake/api/userdata/behaviours.dart';
 import 'package:one_take_pass_remake/pages/reusable/instructor_info.dart';
 import 'package:one_take_pass_remake/themes.dart';
 import 'package:one_take_pass_remake/api/userdata/instructor.dart';
@@ -114,7 +115,13 @@ class _SearchList extends StatelessWidget {
                       context,
                       MaterialPageRoute(
                           builder: (context) => InstructorInfo(
-                              instructor: Instructor("Dummy", "Oi", 3,
+                              instructor: Instructor(
+                                  "Dummy",
+                                  "Oi",
+                                  3,
+                                  Personality.calm,
+                                  SpeakingLanguage.cantonese,
+                                  HKDistrict.est,
                                   "https://avatars.githubusercontent.com/rk0cc"))));
                 });
           } else if (snapshot.hasError) {
