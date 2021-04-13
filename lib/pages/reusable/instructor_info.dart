@@ -68,6 +68,8 @@ class InstructorInfo extends StatelessWidget {
                   SpeakingLanguageGetter(instructor.speakingLanguage).str,
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.w300)),
           Text("District: " + HKDistrictGetter(instructor.hkDistrict).str,
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w300)),
+          Text("Vehicles: " + instructor.vehicles,
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.w300))
         ],
       ),

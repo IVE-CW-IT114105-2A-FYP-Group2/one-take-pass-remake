@@ -122,6 +122,7 @@ class _SearchList extends StatelessWidget {
                                   Personality.calm,
                                   SpeakingLanguage.cantonese,
                                   HKDistrict.est,
+                                  "Private Car",
                                   "https://avatars.githubusercontent.com/rk0cc"))));
                 });
           } else if (snapshot.hasError) {

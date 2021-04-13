@@ -15,10 +15,11 @@ class Instructor {
   Personality personality;
   SpeakingLanguage speakingLanguage;
   HKDistrict hkDistrict;
+  String vehicles;
   String avater;
 
   Instructor(String name, String desc, double rating, Personality personality,
-      SpeakingLanguage speakingLanguage, HKDistrict hkDistrict,
+      SpeakingLanguage speakingLanguage, HKDistrict hkDistrict, String vehicles,
       [String avater = ""]) {
     if (rating > 5 || rating < 0) {
       throw new RangeError("Rating range must between 0 to 5");
@@ -29,6 +30,7 @@ class Instructor {
     this.personality = personality;
     this.speakingLanguage = speakingLanguage;
     this.hkDistrict = hkDistrict;
+    this.vehicles = vehicles;
     this.avater = avater;
   }
 }
