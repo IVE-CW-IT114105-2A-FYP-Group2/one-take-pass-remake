@@ -1,17 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_login/flutter_login.dart';
+import 'package:one_take_pass_remake/api/userdata/login_request.dart';
 import 'package:one_take_pass_remake/pages/index.dart';
 
 class OTPLogin extends StatelessWidget {
   Duration get buffer => Duration(seconds: 5);
 
   ///Check authencation
-  Future<String> _authUser(LoginData lD) {
-    Future.delayed(buffer)
-        //TODO: Convert to API compatable
-        .then((_) {
-      return null;
-    });
+  Future<String> _authUser(LoginData lD) async {
+    UserInfoHandler handler = new UserInfoHandler(lD.name, lD.password);
+    UserREST uRest = await handler.getUserRest();
+    print(uRest.phoneNo);
+    if (uRest.roles == "errors_user") {
+      return "No user record";
+    } else if (uRest.roles == "errors_server") {
+      return "Unable to connect server";
+    }
+    return null;
   }
 
   @override
