@@ -4,8 +4,6 @@ import 'package:one_take_pass_remake/api/userdata/login_request.dart';
 import 'package:one_take_pass_remake/pages/index.dart';
 
 class OTPLogin extends StatelessWidget {
-  Duration get buffer => Duration(seconds: 5);
-
   ///Check authencation
   Future<String> _authUser(LoginData lD) async {
     UserInfoHandler uih = new UserInfoHandler(lD.name, lD.password);
