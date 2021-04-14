@@ -8,15 +8,20 @@ class OTPLogin extends StatelessWidget {
 
   ///Check authencation
   Future<String> _authUser(LoginData lD) async {
-    UserInfoHandler handler = new UserInfoHandler(lD.name, lD.password);
-    UserREST uRest = await handler.getUserRest();
-    print(uRest.phoneNo);
-    if (uRest.roles == "errors_user") {
-      return "No user record";
-    } else if (uRest.roles == "errors_server") {
-      return "Unable to connect server";
+    UserInfoHandler uih = new UserInfoHandler(lD.name, lD.password);
+    UserREST restData = await uih.getUserRest();
+    switch (restData.roles) {
+      case "errors_user":
+        return "User not found"; //When user not found
+      case "errors_server":
+        return "There is an error from server, please try again later"; //When server malfunction
+      case "student":
+      case "instructor":
+        return null; //Use null for success according to API reference
+      case "technician":
+        return "Technician account is not allowed to login the mobile app";
     }
-    return null;
+    return "Unexpected role";
   }
 
   @override
