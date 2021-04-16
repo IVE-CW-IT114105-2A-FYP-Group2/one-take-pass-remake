@@ -1,8 +1,4 @@
-import 'package:cookie_jar/cookie_jar.dart';
-import 'package:dio/dio.dart';
-import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flutter/material.dart';
-import 'package:one_take_pass_remake/api/userdata/login_request.dart';
 import 'package:one_take_pass_remake/pages/login.dart';
 import 'package:one_take_pass_remake/pages/reusable/link_google.dart';
 import 'package:one_take_pass_remake/themes.dart';
@@ -69,22 +65,7 @@ class _OTPAbout extends State<OTPAbout> {
                       ],
                     )).then((doLogout) {
               //Check returned data that is required logout
-              if (doLogout) {
-                var dio = Dio();
-                var session = new GetSession();
-                Future<CookieJar> getCookieJar() async {
-                  return await session.cookieJar;
-                }
-
-                //Weird structre because it is not async function
-                getCookieJar().then((cj) {
-                  dio.interceptors.add(CookieManager(cj));
-                  dio.get(UserInfoHandler.getSignoutURI.toString()).then((_) {
-                    session.removeSession();
-                    requireLogin(ModalRoute.of(context), context);
-                  });
-                });
-              }
+              if (doLogout) requireLogin(ModalRoute.of(context), context);
             });
           },
         ),

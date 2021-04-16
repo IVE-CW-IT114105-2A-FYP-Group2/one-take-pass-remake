@@ -35,8 +35,6 @@ dependencies:
   url_launcher: ^6.0.3
   table_calendar: ^3.0.0
   dio: ^4.0.0
-  cookie_jar: ^3.0.1
-  dio_cookie_manager: ^2.0.0
 
 
   # The following adds the Cupertino Icons font to your application.
