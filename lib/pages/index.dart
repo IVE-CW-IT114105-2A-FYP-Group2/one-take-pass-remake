@@ -139,7 +139,7 @@ class UserIdentify extends StatelessWidget {
                   color: OTPColour.mainTheme,
                   minWidth: MediaQuery.of(context).size.width - 10,
                   child: Text(
-                    "Or click me to right now",
+                    "Or click me right now",
                     style: TextStyle(color: Colors.white, fontSize: 18),
                     textAlign: TextAlign.center,
                   ),
