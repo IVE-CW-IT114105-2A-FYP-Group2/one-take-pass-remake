@@ -120,7 +120,8 @@ class UserIdentify extends StatelessWidget {
             size: 120,
           ),
           Padding(padding: EdgeInsets.only(top: 50)),
-          Text("Unable to get your current login session.",
+          Text(
+              "Unable to get your current login session. Or session has been expired",
               style: TextStyle(fontSize: 18)),
           Padding(padding: EdgeInsets.only(top: 50)),
           Container(
