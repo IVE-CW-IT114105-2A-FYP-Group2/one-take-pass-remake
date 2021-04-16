@@ -93,14 +93,36 @@ Column _roadTest(BuildContext context) {
 }
 
 class _QuestionPage extends StatefulWidget {
+  List<Question> questions = [];
   @override
   State<StatefulWidget> createState() => _QuestionPageUI();
 }
 
 class _QuestionPageUI extends State<_QuestionPage> {
+  Question currentQuestion;
+
+  Question _fetchQuestion() {
+    try {
+      return widget.questions.removeLast();
+    } catch (ioor) {
+      if (widget.questions.length == 0) {
+        return null;
+      }
+      throw "Unexcepted exception when receiving question";
+    }
+  }
+
+  @override
+  void initState() {
+    currentQuestion = _fetchQuestion();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold();
+    return Scaffold(
+      body: Center(),
+    );
   }
 }
 
