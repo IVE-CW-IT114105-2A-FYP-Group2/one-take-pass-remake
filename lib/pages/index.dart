@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:one_take_pass_remake/api/userdata/login_request.dart';
 import 'package:one_take_pass_remake/pages/login.dart';
 import 'package:one_take_pass_remake/pages/subpages/about.dart';
 import 'package:one_take_pass_remake/pages/subpages/calender.dart';
@@ -106,6 +109,12 @@ class UserIdentify extends StatelessWidget {
 
   ///When user data can not receive
   Widget _onFailed(BuildContext context) {
+    void _toLogin() {
+      requireLogin(ModalRoute.of(context), context);
+    }
+
+    var timer = new Timer(Duration(seconds: 5), _toLogin);
+
     return Scaffold(
         body: Center(
             child: Column(
@@ -118,8 +127,9 @@ class UserIdentify extends StatelessWidget {
           ),
           Padding(padding: EdgeInsets.only(top: 50)),
           Text(
-              "Unable to get your current login session. Or session has been expired",
-              style: TextStyle(fontSize: 18)),
+              "Unable to get your current login session\nor your session has been expired.\nThis page will auto redirect to login page in 5 seconds.",
+              style: TextStyle(fontSize: 18),
+              textAlign: TextAlign.center),
           Padding(padding: EdgeInsets.only(top: 50)),
           Container(
               margin: EdgeInsets.all(50),
@@ -129,11 +139,13 @@ class UserIdentify extends StatelessWidget {
                   color: OTPColour.mainTheme,
                   minWidth: MediaQuery.of(context).size.width - 10,
                   child: Text(
-                    "Logout",
-                    style: TextStyle(color: Colors.white, fontSize: 24),
+                    "Or click me to right now",
+                    style: TextStyle(color: Colors.white, fontSize: 18),
+                    textAlign: TextAlign.center,
                   ),
                   onPressed: () {
-                    requireLogin(ModalRoute.of(context), context);
+                    timer.cancel();
+                    _toLogin();
                   }))
         ])));
   }
@@ -152,14 +164,20 @@ class UserIdentify extends StatelessWidget {
         ])));
   }
 
+  ///Get is logined before
+  Future<UserREST> _loginStatus() async {
+    UserREST _cur = await UserLocalStorage.getUser();
+    return _cur;
+  }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: Future.delayed(Duration(seconds: 1), () => true),
+      future: _loginStatus(),
       builder: (context, userdata) {
         if (userdata.hasData) {
           return _onSuccess(child);
-        } else if (userdata.hasError) {
+        } else if (userdata.hasError || userdata.data == null) {
           return _onFailed(context);
         }
         return _oninit();

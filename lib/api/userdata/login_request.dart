@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 ///User data from REST
 class UserREST {
@@ -16,6 +17,9 @@ class UserREST {
         roles: json['type'],
         fullName: json['u_name']);
   }
+
+  Map<String, dynamic> toJson() =>
+      {'phoneNo': int.tryParse(phoneNo), 'type': roles, 'u_name': fullName};
 }
 
 class UserInfoHandler {
@@ -34,8 +38,7 @@ class UserInfoHandler {
     var dio = Dio();
     try {
       FormData f = FormData.fromMap({'phoneno': _phone, 'password': _pwd});
-      var resp =
-          await dio.post(Uri.https(_apiUrl, 'signin').toString(), data: f);
+      var resp = await dio.post(Uri.https(_apiUrl, '').toString(), data: f);
       if (resp.statusCode >= 400) {
         throw "Server error";
       }
@@ -47,5 +50,23 @@ class UserInfoHandler {
     } catch (e) {
       return UserREST(fullName: "", phoneNo: "", roles: "errors_server");
     }
+  }
+}
+
+class UserLocalStorage {
+  static final String _define = "otp_userrest";
+  static Future<void> saveUser(UserREST uR) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString(_define, jsonEncode(uR.toJson()));
+  }
+
+  static Future<UserREST> getUser() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return UserREST.fromJSON(jsonDecode(prefs.getString(_define)));
+  }
+
+  static Future<void> clearUser() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.remove(_define);
   }
 }

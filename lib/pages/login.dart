@@ -15,6 +15,7 @@ class OTPLogin extends StatelessWidget {
         return "There is an error from server, please try again later"; //When server malfunction
       case "student":
       case "instructor":
+        await UserLocalStorage.saveUser(restData);
         return null; //Use null for success according to API reference
       case "technician":
         return "Technician account is not allowed to login the mobile app";

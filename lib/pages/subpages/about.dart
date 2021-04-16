@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:one_take_pass_remake/api/userdata/login_request.dart';
 import 'package:one_take_pass_remake/pages/login.dart';
 import 'package:one_take_pass_remake/pages/reusable/link_google.dart';
 import 'package:one_take_pass_remake/themes.dart';
@@ -65,7 +66,11 @@ class _OTPAbout extends State<OTPAbout> {
                       ],
                     )).then((doLogout) {
               //Check returned data that is required logout
-              if (doLogout) requireLogin(ModalRoute.of(context), context);
+              if (doLogout) {
+                UserLocalStorage.clearUser().then((_) {
+                  requireLogin(ModalRoute.of(context), context);
+                });
+              }
             });
           },
         ),
