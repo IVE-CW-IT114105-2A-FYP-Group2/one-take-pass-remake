@@ -1,5 +1,8 @@
+import 'package:dio/dio.dart';
+import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:one_take_pass_remake/api/userdata/login_request.dart';
 import 'package:one_take_pass_remake/pages/login.dart';
 import 'package:one_take_pass_remake/pages/subpages/about.dart';
 import 'package:one_take_pass_remake/pages/subpages/calender.dart';
@@ -149,6 +152,14 @@ class UserIdentify extends StatelessWidget {
           Padding(padding: EdgeInsets.only(top: 50)),
           CircularProgressIndicator()
         ])));
+  }
+
+  Future<bool> _sessionVerify() async {
+    var dio = Dio();
+    var session = new GetSession();
+    dio.interceptors.add(CookieManager(await session.cookieJar));
+    await dio.get(UserInfoHandler.getSigninURI.toString());
+    return await session.verifySession();
   }
 
   @override
