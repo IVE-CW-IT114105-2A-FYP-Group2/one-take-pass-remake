@@ -98,6 +98,7 @@ class _OTPIndex extends State<OTPIndex> {
 }
 
 class UserIdentify extends StatelessWidget {
+  static bool _firstTime = true;
   final Widget child;
 
   UserIdentify({@required this.child});
@@ -110,44 +111,13 @@ class UserIdentify extends StatelessWidget {
   ///When user data can not receive
   Widget _onFailed(BuildContext context) {
     void _toLogin() {
+      _firstTime = false;
       requireLogin(ModalRoute.of(context), context);
     }
 
-    var timer = new Timer(Duration(seconds: 5), _toLogin);
+    Timer(Duration(seconds: _firstTime ? 0 : 5), _toLogin);
 
-    return Scaffold(
-        body: Center(
-            child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-          Icon(
-            CupertinoIcons.xmark_circle,
-            size: 120,
-          ),
-          Padding(padding: EdgeInsets.only(top: 50)),
-          Text(
-              "Unable to get your current login session\nor your session has been expired.\nThis page will auto redirect to login page in 5 seconds.",
-              style: TextStyle(fontSize: 18),
-              textAlign: TextAlign.center),
-          Padding(padding: EdgeInsets.only(top: 50)),
-          Container(
-              margin: EdgeInsets.all(50),
-              width: MediaQuery.of(context).size.width,
-              child: MaterialButton(
-                  padding: EdgeInsets.all(15),
-                  color: OTPColour.mainTheme,
-                  minWidth: MediaQuery.of(context).size.width - 10,
-                  child: Text(
-                    "Or click me right now",
-                    style: TextStyle(color: Colors.white, fontSize: 18),
-                    textAlign: TextAlign.center,
-                  ),
-                  onPressed: () {
-                    timer.cancel();
-                    _toLogin();
-                  }))
-        ])));
+    return Scaffold(body: Center(child: Text("No existed login record!")));
   }
 
   ///Initalize page
@@ -177,7 +147,7 @@ class UserIdentify extends StatelessWidget {
       builder: (context, userdata) {
         if (userdata.hasData) {
           return _onSuccess(child);
-        } else if (userdata.hasError || userdata.data == null) {
+        } else if (userdata.hasError) {
           return _onFailed(context);
         }
         return _oninit();
