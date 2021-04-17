@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:one_take_pass_remake/api/elearning/questions.dart';
+import 'package:one_take_pass_remake/api/url/types.dart';
 import 'package:one_take_pass_remake/themes.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
@@ -82,11 +83,19 @@ Column _roadTest(BuildContext context) {
     children: [
       _subTitle("Road Test"),
       //Driving skill videos
-      _elButton(FontAwesomeIcons.prayingHands, "Driving Skill Video", () {}),
+      _elButton(FontAwesomeIcons.prayingHands, "Driving Skill Video", () {
+        URLType.website.exec(
+            "youtube.com/playlist?list=PLGJzFdLxDuotoJ0m7VNcSTBB8_Pt5QJE8",
+            true);
+      }),
       //End driving skill video
       Padding(padding: EdgeInsets.all(10)),
       //Road exam video
-      _elButton(FontAwesomeIcons.car, "Road Exam Video", () {})
+      _elButton(FontAwesomeIcons.car, "Road Exam Video", () {
+        URLType.website.exec(
+            "youtube.com/playlist?list=PLGJzFdLxDuovecmtXlaJKf5Vgr5oT8p4x",
+            true);
+      })
       //End road exam video
     ],
   );

@@ -20,8 +20,8 @@ class OTPLogin extends StatelessWidget {
       case "instructor":
         await UserLocalStorage.saveUser(restData);
         return null; //Use null for success according to API reference
-      case "technician":
-        return "Technician account is not allowed to login the mobile app";
+      case "staff":
+        return "Staff account is not allowed to login the mobile app";
     }
     return "Unexpected role";
   }
@@ -126,6 +126,7 @@ class OTPLogin extends StatelessWidget {
 
 ///Trigger login if user is not login yet
 void requireLogin(Route currentRoute, BuildContext context) {
+  //Naviaate
   Navigator.replace(context,
       oldRoute: currentRoute,
       newRoute: MaterialPageRoute(builder: (context) => OTPLogin()));
