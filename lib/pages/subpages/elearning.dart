@@ -15,7 +15,9 @@ class OTPELearning extends StatelessWidget {
       child: ListView(
         children: [
           _writtenTest(context),
-          Padding(padding: EdgeInsets.only(top: 10, bottom: 10)),
+          Padding(
+              padding: EdgeInsets.only(top: 10, bottom: 2.5),
+              child: Divider(color: colourPicker(128, 128, 128, 120))),
           _roadTest(context),
           Padding(padding: EdgeInsets.only(top: 10, bottom: 10)),
         ],

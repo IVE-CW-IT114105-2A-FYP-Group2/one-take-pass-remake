@@ -97,7 +97,18 @@ class _SearchList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-        future: getKWDelay(),
+        future:
+            Future<List<Instructor>>.delayed(Duration(seconds: 1)).then((_) => [
+                  Instructor(
+                      "Dummy",
+                      "Oi",
+                      3,
+                      Personality.calm,
+                      SpeakingLanguage.cantonese,
+                      HKDistrict.est,
+                      "Private Car",
+                      "https://avatars.githubusercontent.com/rk0cc")
+                ]),
         builder: (context, snapshot) {
           if (snapshot.connectionState != ConnectionState.done) {
             //When fetching data
@@ -107,24 +118,32 @@ class _SearchList extends StatelessWidget {
           }
           //Fetched data events
           if (snapshot.hasData) {
-            //Success
-            return MaterialButton(
-                child: Text("Load dummy"),
-                onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => InstructorInfo(
-                              instructor: Instructor(
-                                  "Dummy",
-                                  "Oi",
-                                  3,
-                                  Personality.calm,
-                                  SpeakingLanguage.cantonese,
-                                  HKDistrict.est,
-                                  "Private Car",
-                                  "https://avatars.githubusercontent.com/rk0cc"))));
-                });
+            return ListView.builder(
+              itemCount: snapshot.data.length,
+              itemBuilder: (context, count) => Container(
+                child: MaterialButton(
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      (snapshot.data[count].avater != "")
+                          ? CircleAvatar(
+                              foregroundImage:
+                                  NetworkImage(snapshot.data[count].avater))
+                          : Icon(Icons.person, size: 36),
+                      Text(snapshot.data[count].name,
+                          style: TextStyle(fontSize: 24))
+                    ],
+                  ),
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => InstructorInfo(
+                                instructor: snapshot.data[count])));
+                  },
+                ),
+              ),
+            );
           } else if (snapshot.hasError) {
             //Error
             return Center(

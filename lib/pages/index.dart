@@ -4,9 +4,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:one_take_pass_remake/api/userdata/login_request.dart';
 import 'package:one_take_pass_remake/pages/login.dart';
-import 'package:one_take_pass_remake/pages/subpages/about.dart';
-import 'package:one_take_pass_remake/pages/subpages/calender.dart';
-import 'package:one_take_pass_remake/pages/subpages/inbox.dart';
 import 'package:one_take_pass_remake/themes.dart';
 import './subpages/export.dart';
 
@@ -75,25 +72,39 @@ class _OTPIndex extends State<OTPIndex> {
     });
   }
 
+  FloatingActionButton _actionBtnMap() {
+    switch (_currentIdx) {
+      case 1:
+        return FloatingActionButton(
+          onPressed: () {},
+          child: Icon(Icons.add),
+          mini: false,
+          tooltip: "Add events",
+        );
+      default:
+        return null;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return UserIdentify(
         child: Scaffold(
-      appBar: AppBar(
-        title: Text("One Take Pass"),
-        titleTextStyle: TextStyle(fontWeight: FontWeight.w300),
-        centerTitle: true,
-      ),
-      body: _pmap.widgetList.elementAt(_currentIdx),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIdx,
-        items: _pmap.bnbItems,
-        onTap: _onTab,
-        backgroundColor: OTPColour.light1,
-        unselectedItemColor: OTPColour.light2,
-        selectedItemColor: OTPColour.dark2,
-      ),
-    ));
+            appBar: AppBar(
+              title: Text("One Take Pass"),
+              titleTextStyle: TextStyle(fontWeight: FontWeight.w300),
+              centerTitle: true,
+            ),
+            body: _pmap.widgetList.elementAt(_currentIdx),
+            bottomNavigationBar: BottomNavigationBar(
+              currentIndex: _currentIdx,
+              items: _pmap.bnbItems,
+              onTap: _onTab,
+              backgroundColor: OTPColour.light1,
+              unselectedItemColor: OTPColour.light2,
+              selectedItemColor: OTPColour.dark2,
+            ),
+            floatingActionButton: _actionBtnMap()));
   }
 }
 
