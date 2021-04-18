@@ -17,7 +17,7 @@ class _OTPAbout extends State<OTPAbout> {
     return Center(
         child: Column(children: [
       Padding(padding: EdgeInsets.only(top: 10)),
-      Container(
+      /*Container(
         width: MediaQuery.of(context).size.width - 10,
         child: MaterialButton(
           padding: EdgeInsets.all(10),
@@ -34,7 +34,26 @@ class _OTPAbout extends State<OTPAbout> {
           },
         ),
       ),
-      Padding(padding: EdgeInsets.only(top: 5)),
+      Padding(padding: EdgeInsets.only(top: 5)),*/
+      Center(
+        child: Icon(
+          Icons.person,
+          size: 120,
+        ),
+      ),
+      Container(
+        width: MediaQuery.of(context).size.width - 10,
+        child: MaterialButton(
+          padding: EdgeInsets.all(10),
+          color: OTPColour.mainTheme,
+          child: Text("Edit profile",
+              style: TextStyle(fontSize: 16, color: Colors.white)),
+          onPressed: () {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => _EditProfile()));
+          },
+        ),
+      ),
       Container(
         width: MediaQuery.of(context).size.width - 10,
         child: MaterialButton(
@@ -83,5 +102,58 @@ class _GoogleLink {
   bool _islinked = false;
   bool get status {
     return _islinked;
+  }
+}
+
+class _EditProfile extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        appBar: AppBar(
+          actions: [
+            TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: Text(
+                  "Save",
+                  style: TextStyle(color: OTPColour.dark1),
+                ))
+          ],
+        ),
+        body: Padding(
+          padding: EdgeInsets.only(left: 10, right: 10, top: 5),
+          child: ListView(
+            children: [
+              TextField(
+                decoration: InputDecoration(labelText: "Name"),
+              ),
+              Divider(),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Gender",
+                    style: TextStyle(fontSize: 24),
+                  ),
+                  RadioListTile(
+                    value: true,
+                    groupValue: "gender",
+                    onChanged: (_) {},
+                    title: Text("Male"),
+                    selected: true,
+                  ),
+                  RadioListTile(
+                    value: false,
+                    groupValue: "gender",
+                    onChanged: (_) {},
+                    title: Text("Feale"),
+                  )
+                ],
+              ),
+              Divider(),
+            ],
+          ),
+        ));
   }
 }

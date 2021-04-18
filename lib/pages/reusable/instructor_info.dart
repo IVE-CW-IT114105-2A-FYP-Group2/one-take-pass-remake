@@ -88,7 +88,14 @@ class InstructorInfo extends StatelessWidget {
         children: [
           _heading(context),
           _details(),
-          Divider(color: colourPicker(128, 128, 128, 120))
+          Divider(color: colourPicker(128, 128, 128, 120)),
+          Center(
+            child: MaterialButton(
+              color: OTPColour.light1,
+              onPressed: () {},
+              child: Text("Open chat"),
+            ),
+          )
         ],
       ),
     );

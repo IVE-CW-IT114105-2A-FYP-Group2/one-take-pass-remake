@@ -61,11 +61,17 @@ Column _writtenTest(BuildContext context) {
     children: [
       _subTitle("Written Test"),
       //Text-only questions
-      _elButton(FontAwesomeIcons.wordpressSimple, "Text-only Questions", () {}),
+      _elButton(FontAwesomeIcons.wordpressSimple, "Text-only Questions", () {
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => _QuestionPage()));
+      }),
       //End text-only question
       Padding(padding: EdgeInsets.all(10)),
       //Symbol questions
-      _elButton(FontAwesomeIcons.road, "Symbol Questions", () {}),
+      _elButton(FontAwesomeIcons.road, "Symbol Questions", () {
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => _QuestionPage()));
+      }),
       //End symbol questions
       Padding(padding: EdgeInsets.all(10)),
       //Combine questions
@@ -104,7 +110,13 @@ Column _roadTest(BuildContext context) {
 }
 
 class _QuestionPage extends StatefulWidget {
-  List<Question> questions = [];
+  List<Question> questions = [
+    TextQuestion("Foo", [
+      Answer(answerString: "bar", isCorrect: false),
+      Answer(answerString: "bar", isCorrect: false),
+      Answer(answerString: "Bar", isCorrect: true)
+    ])
+  ];
   @override
   State<StatefulWidget> createState() => _QuestionPageUI();
 }
@@ -132,7 +144,20 @@ class _QuestionPageUI extends State<_QuestionPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(),
+      appBar: AppBar(),
+      body: Center(
+        child: Column(
+          children: [
+            currentQuestion.interface(() {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => _CorrectAns()));
+            }, () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => _IncorrectAns()));
+            })
+          ],
+        ),
+      ),
     );
   }
 }

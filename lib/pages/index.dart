@@ -72,11 +72,16 @@ class _OTPIndex extends State<OTPIndex> {
     });
   }
 
-  FloatingActionButton _actionBtnMap() {
+  FloatingActionButton _actionBtnMap(BuildContext context) {
     switch (_currentIdx) {
       case 1:
         return FloatingActionButton(
-          onPressed: () {},
+          onPressed: () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => OTPCalenderEventAdder()));
+          },
           child: Icon(Icons.add),
           mini: false,
           tooltip: "Add events",
@@ -104,7 +109,7 @@ class _OTPIndex extends State<OTPIndex> {
               unselectedItemColor: OTPColour.light2,
               selectedItemColor: OTPColour.dark2,
             ),
-            floatingActionButton: _actionBtnMap()));
+            floatingActionButton: _actionBtnMap(context)));
   }
 }
 

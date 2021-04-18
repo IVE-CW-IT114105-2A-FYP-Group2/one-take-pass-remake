@@ -1,4 +1,6 @@
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:one_take_pass_remake/themes.dart';
 
 abstract class Question {
   String _question;
@@ -12,7 +14,7 @@ abstract class Question {
     this._choice = choice;
   }
 
-  Widget interface();
+  Widget interface(Function onCorrect, Function onWrong);
 
   String get question {
     return _question;
@@ -29,25 +31,36 @@ class TextQuestion extends Question {
     this.setChoice(choice);
   }
   @override
-  Widget interface() {
+  Widget interface(Function onCorrect, Function onWrong) {
     return Container(
-      child: Column(
-        children: [
-          Text(
-            question,
-            style: TextStyle(fontSize: 24),
-            textAlign: TextAlign.center,
-          ),
-          Padding(padding: EdgeInsets.all(10)),
-        ],
-      ),
+      child: Column(children: [
+        Text(
+          question,
+          style: TextStyle(fontSize: 24),
+          textAlign: TextAlign.center,
+        ),
+        Padding(padding: EdgeInsets.all(10)),
+        Container(
+            height: 250,
+            child: ListView.builder(
+                itemCount: choice.length,
+                itemBuilder: (context, qNo) => MaterialButton(
+                      onPressed: choice[qNo].isCorrect ? onCorrect : onWrong,
+                      child: Padding(
+                          padding: EdgeInsets.all(8),
+                          child: Text(
+                            choice[qNo].answerString,
+                            style: TextStyle(color: Colors.white, fontSize: 18),
+                          )),
+                      color: OTPColour.dark1,
+                    ))),
+      ]),
     );
   }
 }
 
 class Answer {
   final bool isCorrect;
-  bool isSelected = false;
   final String answerString;
   Answer({@required this.answerString, @required this.isCorrect});
 }
