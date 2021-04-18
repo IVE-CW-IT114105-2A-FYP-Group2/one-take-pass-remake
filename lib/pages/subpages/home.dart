@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:one_take_pass_remake/api/userdata/behaviours.dart';
 import 'package:one_take_pass_remake/pages/reusable/instructor_info.dart';
 import 'package:one_take_pass_remake/themes.dart';
-import 'package:one_take_pass_remake/api/userdata/instructor.dart';
+import 'package:one_take_pass_remake/api/userdata/users.dart';
 
 class OTPHome extends StatelessWidget {
   @override
@@ -97,18 +97,8 @@ class _SearchList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-        future:
-            Future<List<Instructor>>.delayed(Duration(seconds: 1)).then((_) => [
-                  Instructor(
-                      "Dummy",
-                      "Oi",
-                      3,
-                      Personality.calm,
-                      SpeakingLanguage.cantonese,
-                      HKDistrict.est,
-                      "Private Car",
-                      "https://avatars.githubusercontent.com/rk0cc")
-                ]),
+        future: Future<List<Instructor>>.delayed(Duration(seconds: 1))
+            .then((_) => Instructor.dummyInstructor),
         builder: (context, snapshot) {
           if (snapshot.connectionState != ConnectionState.done) {
             //When fetching data

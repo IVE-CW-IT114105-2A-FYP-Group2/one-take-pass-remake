@@ -10,10 +10,13 @@ class OTPLogin extends StatelessWidget {
   Future<String> _authUser(LoginData lD) async {
     _isLogin = true;
     UserInfoHandler uih = new UserInfoHandler(lD.name, lD.password);
-    UserREST restData = await uih.getUserRest();
+    UserREST restData = UserREST(
+        fullName: "Sia Tao",
+        phoneNo: "91234567",
+        roles: "student"); //await uih.getUserRest();
     switch (restData.roles) {
       case "errors_user":
-        return "User not found"; //When user not found
+        return "User not found or wrong password"; //When user not found
       case "errors_server":
         return "There is an error from server, please try again later"; //When server malfunction
       case "student":

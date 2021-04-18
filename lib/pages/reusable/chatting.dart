@@ -11,7 +11,7 @@ class ChatComm extends StatefulWidget {
 
 class _ChatComm extends State<ChatComm> {
   TextEditingController _controller;
-  List<Widget> _chatElements = [_ChatElements._receiverBox("Hi")];
+  List<Widget> _chatElements = [_ChatElements._getMsgBox("Hi", false)];
 
   @override
   void initState() {
@@ -77,28 +77,41 @@ class _ChatComm extends State<ChatComm> {
 }
 
 class _ChatElements {
-  static Widget _senderBox(String msg) {
+  static Widget _getMsgBox(String msg, bool isSender) {
+    return Container(
+      child: isSender ? _senderBox(msg) : _receiverBox(msg),
+      margin: EdgeInsets.all(10),
+    );
+  }
+
+  static Padding _senderBox(String msg) {
     return Padding(
         padding: EdgeInsets.only(left: 100),
         child: Container(
+          decoration: BoxDecoration(
+              shape: BoxShape.rectangle,
+              borderRadius: BorderRadius.all(Radius.circular(5))),
+          color: OTPColour.light2,
           child: Text(
             msg,
             style: TextStyle(fontSize: 18),
             textAlign: TextAlign.right,
           ),
-          color: OTPColour.light2,
         ));
   }
 
-  static Widget _receiverBox(String msg) {
+  static Padding _receiverBox(String msg) {
     return Padding(
         padding: EdgeInsets.only(right: 100),
         child: Container(
+          decoration: BoxDecoration(
+              color: Colors.grey,
+              shape: BoxShape.rectangle,
+              borderRadius: BorderRadius.all(Radius.circular(5))),
           child: Text(
             msg,
             style: TextStyle(fontSize: 18),
           ),
-          color: Colors.grey,
         ));
   }
 }

@@ -125,8 +125,8 @@ class _QuestionPageUI extends State<_QuestionPage> {
 
   @override
   void initState() {
-    currentQuestion = _fetchQuestion();
     super.initState();
+    currentQuestion = _fetchQuestion();
   }
 
   @override

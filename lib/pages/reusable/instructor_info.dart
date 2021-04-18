@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:one_take_pass_remake/api/userdata/instructor.dart';
+import 'package:one_take_pass_remake/api/userdata/users.dart';
 import 'package:one_take_pass_remake/themes.dart';
 
 ///A page about instructor
