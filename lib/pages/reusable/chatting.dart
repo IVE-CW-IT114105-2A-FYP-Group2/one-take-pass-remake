@@ -15,8 +15,8 @@ class _ChatComm extends State<ChatComm> {
 
   @override
   void initState() {
-    super.initState();
     _controller = TextEditingController();
+    super.initState();
   }
 
   @override
@@ -62,9 +62,11 @@ class _ChatComm extends State<ChatComm> {
                             color: OTPColour.light2,
                             child: Text("Send"),
                             onPressed: () {
-                              _chatElements.add(
-                                  _ChatElements._senderBox(_controller.text));
-                              setState(() {});
+                              _chatElements.add(_ChatElements._getMsgBox(
+                                  _controller.text, true));
+                              setState(() {
+                                _controller.clear();
+                              });
                             }))
                   ],
                 ),
@@ -89,14 +91,16 @@ class _ChatElements {
         padding: EdgeInsets.only(left: 100),
         child: Container(
           decoration: BoxDecoration(
+              color: OTPColour.light2,
               shape: BoxShape.rectangle,
               borderRadius: BorderRadius.all(Radius.circular(5))),
-          color: OTPColour.light2,
-          child: Text(
-            msg,
-            style: TextStyle(fontSize: 18),
-            textAlign: TextAlign.right,
-          ),
+          child: Padding(
+              padding: EdgeInsets.all(5),
+              child: Text(
+                msg,
+                style: TextStyle(fontSize: 18),
+                textAlign: TextAlign.right,
+              )),
         ));
   }
 
@@ -108,10 +112,12 @@ class _ChatElements {
               color: Colors.grey,
               shape: BoxShape.rectangle,
               borderRadius: BorderRadius.all(Radius.circular(5))),
-          child: Text(
-            msg,
-            style: TextStyle(fontSize: 18),
-          ),
+          child: Padding(
+              padding: EdgeInsets.all(5),
+              child: Text(
+                msg,
+                style: TextStyle(fontSize: 18),
+              )),
         ));
   }
 }
