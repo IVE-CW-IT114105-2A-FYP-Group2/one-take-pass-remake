@@ -34,6 +34,7 @@ class UserInfoHandler {
 
   Future<UserREST> getUserRest() async {
     try {
+      //Get token from server
       String _token =
           await UserAPIHandler.getToken({'phoneno': _phone, 'password': _pwd});
       try {
@@ -50,7 +51,9 @@ class UserInfoHandler {
   }
 }
 
+///A handler that getting API data
 class UserAPIHandler {
+  ///Get token
   static Future<String> getToken(Map<String, dynamic> jsonLogin) async {
     var dio = Dio();
     dio.options.headers['Content-Type'] = "application/json";
@@ -62,6 +65,7 @@ class UserAPIHandler {
     return r.data['server_token'];
   }
 
+  ///User user info
   static Future<UserREST> getUserRest(String token) async {
     var dio = Dio();
     dio.options.headers['Content-Type'] = "application/json";
@@ -74,18 +78,24 @@ class UserAPIHandler {
   }
 }
 
+///Local storage controller for managing token
 class UserTokenLocalStorage {
+  ///Key name for definition
   static final String _define = "otp_user_token";
+
+  ///Save the token string
   static Future<void> saveToken(String token) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setString(_define, token);
   }
 
+  ///Get the token string
   static Future<String> getToken() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.getString(_define);
   }
 
+  ///Wipe token string
   static Future<void> clearToken() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.remove(_define);
