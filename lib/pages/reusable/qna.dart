@@ -14,6 +14,7 @@ class QuestionPageHandler {
     var dio = Dio();
     var _qHttp = await dio.get(APISitemap.getAns(mode).toString());
     List<dynamic> _qR = _qHttp.data;
+    print(_qR);
     List<Question> _qOs = [];
     switch (mode) {
       case 0:
@@ -29,6 +30,7 @@ class QuestionPageHandler {
 
   static void start(BuildContext context, int mode) {
     new QuestionPageHandler(mode: mode)._loadQuestion().then((qL) {
+      print("Invoked!");
       Navigator.push(context,
           MaterialPageRoute(builder: (context) => QuestionPage(questions: qL)));
     });
@@ -50,7 +52,7 @@ class _QuestionPage extends State<QuestionPage> {
   static bool _isTesting = true;
   List<Question> _qS;
   Question _q;
-  int correctCount = 0;
+  int correctCount = 0, totalQuestion;
 
   ///Toggle next question
   void _nextQuestion() {
@@ -64,12 +66,13 @@ class _QuestionPage extends State<QuestionPage> {
 
   ///Question number
   int get _questionNo {
-    return widget.questions.length - _qS.length + 1;
+    return totalQuestion - _qS.length;
   }
 
   @override
   void initState() {
     _qS = widget.questions;
+    totalQuestion = widget.questions.length;
     super.initState();
     _nextQuestion();
   }
@@ -90,9 +93,46 @@ class _QuestionPage extends State<QuestionPage> {
     return Container(
         margin: EdgeInsets.all(10),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [Text("")],
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Container(
+                width: MediaQuery.of(context).size.width,
+                child: Text(
+                  "You asked",
+                  style: TextStyle(fontSize: 36),
+                )),
+            Container(
+                width: MediaQuery.of(context).size.width,
+                child: Text(
+                  totalQuestion.toString() + " questions",
+                  textAlign: TextAlign.right,
+                  style: TextStyle(fontSize: 28),
+                )),
+            Divider(),
+            Text(
+                "and answered " +
+                    correctCount.toString() +
+                    " question" +
+                    ((correctCount == 1) ? " is" : "s are") +
+                    "correct",
+                style: TextStyle(fontSize: 18)),
+            Container(
+                width: MediaQuery.of(context).size.width,
+                margin: EdgeInsets.all(30),
+                child: MaterialButton(
+                  color: OTPColour.dark2,
+                  padding: EdgeInsets.all(7),
+                  child: Text(
+                    "Exit",
+                    style: TextStyle(color: Colors.white, fontSize: 24),
+                  ),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                ))
+          ],
         ));
   }
 
@@ -201,7 +241,7 @@ abstract class _ReviewAnswer extends StatelessWidget {
               Text(
                 response(),
                 style: TextStyle(
-                    fontSize: 63,
+                    fontSize: 48,
                     fontWeight: FontWeight.w400,
                     color: Colors.black),
                 textAlign: TextAlign.center,
@@ -209,11 +249,11 @@ abstract class _ReviewAnswer extends StatelessWidget {
               Padding(padding: EdgeInsets.only(top: 100)),
               _actionBtn(context, "Next", OTPColour.mainTheme, () {
                 _triggerByButton = true;
-                Navigator.pop(context, true);
+                Navigator.pop(context, false);
               }),
               _actionBtn(context, "Give Up", Colors.redAccent, () {
                 _triggerByButton = true;
-                Navigator.pop(context, false);
+                Navigator.pop(context, true);
               })
             ],
           ),
@@ -238,7 +278,7 @@ class _IncorrectAns extends _ReviewAnswer {
   _IncorrectAns({@required this.actual}) : super();
 
   @override
-  Color bgColour() => colourPicker(175, 12, 12);
+  Color bgColour() => colourPicker(200, 12, 12);
 
   @override
   String response() => "Incorrect!\nThe correct answer is:\n" + actual;
