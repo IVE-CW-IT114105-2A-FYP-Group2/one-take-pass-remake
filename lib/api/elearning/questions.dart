@@ -93,6 +93,14 @@ class TextQuestion extends Question {
   }
 }
 
+class SymbolQuestion extends Question {
+  @override
+  Widget interface(Function onCorrect, Function onWrong) {
+    // TODO: implement interface
+    throw UnimplementedError();
+  }
+}
+
 class AnswerChoice {
   final String answerString;
   AnswerChoice({@required this.answerString});
