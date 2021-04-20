@@ -33,16 +33,14 @@ class UserInfoHandler {
   }
 
   Future<UserREST> getUserRest() async {
-    var dio = Dio();
     try {
-      dio.options.headers['Content-Type'] = "application/json";
-      var resp = await dio.post(APISitemap.signin.toString(),
-          data: jsonEncode({'phoneno': _phone, 'password': _pwd}));
-      if (resp.statusCode >= 400) {
-        throw "Server error";
-      }
+      String _token =
+          await UserAPIHandler.getToken({'phoneno': _phone, 'password': _pwd});
       try {
-        return UserREST.fromJSON(resp.data); //Auto convert from json to object
+        //Save to shared prefs first, it will be clear if not
+        await UserTokenLocalStorage.saveToken(_token);
+        var uresp = await UserAPIHandler.getUserRest(_token);
+        return uresp; //Auto convert from json to object
       } catch (nouser) {
         return UserREST(phoneNo: "", roles: "errors_user", fullName: "");
       }
@@ -52,19 +50,43 @@ class UserInfoHandler {
   }
 }
 
-class UserLocalStorage {
-  static final String _define = "otp_userrest";
-  static Future<void> saveUser(UserREST uR) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setString(_define, jsonEncode(uR.toJson()));
+class UserAPIHandler {
+  static Future<String> getToken(Map<String, dynamic> jsonLogin) async {
+    var dio = Dio();
+    dio.options.headers['Content-Type'] = "application/json";
+    var r = await dio.post(APISitemap.signin.toString(), //Token response
+        data: jsonEncode(jsonLogin));
+    if (r.statusCode >= 400) {
+      throw "Server error";
+    }
+    return r.data['server_token'];
   }
 
-  static Future<UserREST> getUser() async {
+  static Future<UserREST> getUserRest(String token) async {
+    var dio = Dio();
+    dio.options.headers['Content-Type'] = "application/json";
+    var r = await dio.post(APISitemap.fetchUserViaToken.toString(),
+        data: jsonEncode({"refresh_token": token}));
+    if (r.statusCode >= 400) {
+      throw "Server error";
+    }
+    return UserREST.fromJSON(r.data);
+  }
+}
+
+class UserTokenLocalStorage {
+  static final String _define = "otp_user_token";
+  static Future<void> saveToken(String token) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    return UserREST.fromJSON(jsonDecode(prefs.getString(_define)));
+    prefs.setString(_define, token);
   }
 
-  static Future<void> clearUser() async {
+  static Future<String> getToken() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_define);
+  }
+
+  static Future<void> clearToken() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.remove(_define);
   }

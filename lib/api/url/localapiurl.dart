@@ -10,6 +10,10 @@ class APISitemap {
     return Uri.https(_apiUrl, 'question/ask');
   }
 
+  static Uri get fetchUserViaToken {
+    return Uri.https(_apiUrl, 'getinfo');
+  }
+
   static Uri getAns(int mode) {
     switch (mode) {
       case 0:

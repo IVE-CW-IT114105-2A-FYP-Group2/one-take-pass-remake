@@ -86,7 +86,7 @@ class _OTPAbout extends State<OTPAbout> {
                     )).then((doLogout) {
               //Check returned data that is required logout
               if (doLogout) {
-                UserLocalStorage.clearUser().then((_) {
+                UserTokenLocalStorage.clearToken().then((_) {
                   requireLogin(ModalRoute.of(context), context);
                 });
               }

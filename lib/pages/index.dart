@@ -152,7 +152,8 @@ class UserIdentify extends StatelessWidget {
 
   ///Get is logined before
   Future<UserREST> _loginStatus() async {
-    UserREST _cur = await UserLocalStorage.getUser();
+    UserREST _cur = await UserAPIHandler.getUserRest(
+        await UserTokenLocalStorage.getToken());
     return _cur;
   }
 

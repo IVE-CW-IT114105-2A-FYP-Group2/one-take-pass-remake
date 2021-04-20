@@ -10,10 +10,7 @@ class OTPLogin extends StatelessWidget {
   Future<String> _authUser(LoginData lD) async {
     _isLogin = true;
     UserInfoHandler uih = new UserInfoHandler(lD.name, lD.password);
-    UserREST restData = UserREST(
-        fullName: "Sia Tao",
-        phoneNo: "91234567",
-        roles: "student"); //await uih.getUserRest();
+    UserREST restData = await uih.getUserRest();
     switch (restData.roles) {
       case "errors_user":
         return "User not found or wrong password"; //When user not found
@@ -21,9 +18,9 @@ class OTPLogin extends StatelessWidget {
         return "There is an error from server, please try again later"; //When server malfunction
       case "student":
       case "instructor":
-        await UserLocalStorage.saveUser(restData);
         return null; //Use null for success according to API reference
       case "staff":
+        await UserTokenLocalStorage.clearToken();
         return "Staff account is not allowed to login the mobile app";
     }
     return "Unexpected role";
