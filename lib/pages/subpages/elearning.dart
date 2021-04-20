@@ -1,7 +1,10 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:one_take_pass_remake/api/elearning/questions.dart';
+import 'package:one_take_pass_remake/api/url/localapiurl.dart';
 import 'package:one_take_pass_remake/api/url/types.dart';
+import 'package:one_take_pass_remake/pages/reusable/qna.dart';
 import 'package:one_take_pass_remake/themes.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
@@ -62,16 +65,12 @@ Column _writtenTest(BuildContext context) {
       _subTitle("Written Test"),
       //Text-only questions
       _elButton(FontAwesomeIcons.wordpressSimple, "Text-only Questions", () {
-        Navigator.push(
-            context, MaterialPageRoute(builder: (context) => _QuestionPage()));
+        QuestionPageHandler.start(context, 0);
       }),
       //End text-only question
       Padding(padding: EdgeInsets.all(10)),
       //Symbol questions
-      _elButton(FontAwesomeIcons.road, "Symbol Questions", () {
-        Navigator.push(
-            context, MaterialPageRoute(builder: (context) => _QuestionPage()));
-      }),
+      _elButton(FontAwesomeIcons.road, "Symbol Questions", () {}),
       //End symbol questions
       Padding(padding: EdgeInsets.all(10)),
       //Combine questions
@@ -107,120 +106,4 @@ Column _roadTest(BuildContext context) {
       //End road exam video
     ],
   );
-}
-
-class _QuestionPage extends StatefulWidget {
-  List<Question> questions = [
-    TextQuestion("Foo", [
-      Answer(answerString: "bar", isCorrect: false),
-      Answer(answerString: "bar", isCorrect: false),
-      Answer(answerString: "Bar", isCorrect: true)
-    ])
-  ];
-  @override
-  State<StatefulWidget> createState() => _QuestionPageUI();
-}
-
-class _QuestionPageUI extends State<_QuestionPage> {
-  Question currentQuestion;
-
-  Question _fetchQuestion() {
-    try {
-      return widget.questions.removeLast();
-    } catch (ioor) {
-      if (widget.questions.length == 0) {
-        return null;
-      }
-      throw "Unexcepted exception when receiving question";
-    }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    currentQuestion = _fetchQuestion();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(),
-      body: Center(
-        child: Column(
-          children: [
-            currentQuestion.interface(() {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => _CorrectAns()));
-            }, () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => _IncorrectAns()));
-            })
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-abstract class _ReviewAnswer extends StatelessWidget {
-  Color bgColour();
-  String response();
-
-  ///Predefine style of action button
-  Container _actionBtn(
-      BuildContext context, String btnTxt, Color bg, Function onPressed) {
-    return Container(
-      margin: EdgeInsets.only(top: 25, bottom: 25),
-      width: MediaQuery.of(context).size.width - 10,
-      height: 50,
-      child: MaterialButton(
-        child:
-            Text(btnTxt, style: TextStyle(fontSize: 18, color: Colors.white)),
-        color: bg,
-        onPressed: onPressed,
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: bgColour(),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Text(
-              response(),
-              style: TextStyle(
-                  fontSize: 63,
-                  fontWeight: FontWeight.w400,
-                  color: Colors.black),
-              textAlign: TextAlign.center,
-            ),
-            Padding(padding: EdgeInsets.only(top: 100)),
-            _actionBtn(context, "Next Question", OTPColour.mainTheme, () {}),
-            _actionBtn(context, "Give Up", Colors.redAccent, () {})
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _CorrectAns extends _ReviewAnswer {
-  @override
-  Color bgColour() => OTPColour.light2;
-
-  @override
-  String response() => "Correct!";
-}
-
-class _IncorrectAns extends _ReviewAnswer {
-  @override
-  Color bgColour() => colourPicker(175, 12, 12);
-
-  @override
-  String response() => "Incorrect!";
 }

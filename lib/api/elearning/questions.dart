@@ -1,16 +1,20 @@
+import 'dart:convert';
+
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:one_take_pass_remake/api/url/localapiurl.dart';
 import 'package:one_take_pass_remake/themes.dart';
 
 abstract class Question {
   String _question;
-  List<Answer> _choice;
+  List<AnswerChoice> _choice;
 
   void setQuestion(String question) {
     this._question = question;
   }
 
-  void setChoice(List<Answer> choice) {
+  void setChoice(List<AnswerChoice> choice) {
     this._choice = choice;
   }
 
@@ -20,13 +24,13 @@ abstract class Question {
     return _question;
   }
 
-  List<Answer> get choice {
+  List<AnswerChoice> get choice {
     return _choice;
   }
 }
 
 class TextQuestion extends Question {
-  TextQuestion(String question, List<Answer> choice) {
+  TextQuestion(String question, List<AnswerChoice> choice) {
     this.setQuestion(question);
     this.setChoice(choice);
   }
@@ -45,7 +49,19 @@ class TextQuestion extends Question {
             child: ListView.builder(
                 itemCount: choice.length,
                 itemBuilder: (context, qNo) => MaterialButton(
-                      onPressed: choice[qNo].isCorrect ? onCorrect : onWrong,
+                      onPressed: () async {
+                        var dio = Dio();
+                        dio.options.headers["Content-Type"] =
+                            "application/json";
+                        var ansObj = await dio.post(
+                            APISitemap.postAns.toString(),
+                            data: jsonEncode({
+                              "question": question,
+                              "answer": choice[qNo].answerString
+                            }));
+                        APIAnsResp respAns = APIAnsResp.fromJSON(ansObj.data);
+                        respAns.correct ? onCorrect() : onWrong(respAns.answer);
+                      },
                       child: Padding(
                           padding: EdgeInsets.all(8),
                           child: Text(
@@ -57,10 +73,30 @@ class TextQuestion extends Question {
       ]),
     );
   }
+
+  factory TextQuestion.fromJSON(Map<String, dynamic> json) {
+    return TextQuestion(json["question"], [
+      AnswerChoice(answerString: json["A1"]),
+      AnswerChoice(answerString: json["A2"]),
+      AnswerChoice(answerString: json["A3"])
+    ]);
+  }
 }
 
-class Answer {
-  final bool isCorrect;
+class AnswerChoice {
   final String answerString;
-  Answer({@required this.answerString, @required this.isCorrect});
+  AnswerChoice({@required this.answerString});
+}
+
+class APIAnsResp {
+  final bool correct;
+  final String answer;
+
+  APIAnsResp({@required this.correct, @required this.answer});
+
+  factory APIAnsResp.fromJSON(Map<String, dynamic> json) {
+    return APIAnsResp(correct: json['correct'], answer: json['answer']);
+  }
+
+  Map<String, dynamic> toJSON() => {"correct": correct, "answer": answer};
 }

@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
+import 'package:one_take_pass_remake/api/url/localapiurl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 ///User data from REST
@@ -31,14 +32,12 @@ class UserInfoHandler {
     this._pwd = pwd;
   }
 
-  ///URL of API
-  final String _apiUrl = "ivefypgroup2w1offical.azurewebsites.net";
-
   Future<UserREST> getUserRest() async {
     var dio = Dio();
     try {
-      FormData f = FormData.fromMap({'phoneno': _phone, 'password': _pwd});
-      var resp = await dio.post(Uri.https(_apiUrl, '').toString(), data: f);
+      dio.options.headers['Content-Type'] = "application/json";
+      var resp = await dio.post(APISitemap.signin.toString(),
+          data: jsonEncode({'phoneno': _phone, 'password': _pwd}));
       if (resp.statusCode >= 400) {
         throw "Server error";
       }

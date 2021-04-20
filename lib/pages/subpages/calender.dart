@@ -19,44 +19,59 @@ class _OTPCalender extends State<OTPCalender> {
 
   @override
   Widget build(BuildContext context) {
-    return TableCalendar(
-      calendarBuilders: CalendarBuilders(headerTitleBuilder: (context, dt) {
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(dt.year.toString(),
-                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w300)),
-            Text(DateFormat("MMMM").format(dt),
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700))
-          ],
-        );
-      }),
-      focusedDay: _focusedDate,
-      firstDay: DateTime((DateTime.now().year - 3), 1, 1),
-      lastDay: DateTime((DateTime.now().year + 3), 12, 31),
-      selectedDayPredicate: (date) => isSameDay(_selectedDate, date),
-      onDaySelected: (selected, focused) {
-        setState(() {
-          _selectedDate = selected;
+    return Column(children: [
+      TableCalendar(
+        calendarBuilders: CalendarBuilders(headerTitleBuilder: (context, dt) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(dt.year.toString(),
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w300)),
+              Text(DateFormat("MMMM").format(dt),
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700))
+            ],
+          );
+        }),
+        focusedDay: _focusedDate,
+        firstDay: DateTime((DateTime.now().year - 3), 1, 1),
+        lastDay: DateTime((DateTime.now().year + 3), 12, 31),
+        selectedDayPredicate: (date) => isSameDay(_selectedDate, date),
+        onDaySelected: (selected, focused) {
+          setState(() {
+            _selectedDate = selected;
+            _focusedDate = focused;
+          });
+        },
+        calendarFormat: _format,
+        onPageChanged: (focused) {
           _focusedDate = focused;
-        });
-      },
-      calendarFormat: _format,
-      onPageChanged: (focused) {
-        _focusedDate = focused;
-      },
-      onFormatChanged: (format) {
-        setState(() {
-          _format = format;
-        });
-      },
-      eventLoader: (dt) {
-        if (dt.weekday == DateTime.monday) {
-          return ["Driving lesson"];
-        }
-        return [];
-      },
-    );
+        },
+        onFormatChanged: (format) {
+          setState(() {
+            _format = format;
+          });
+        },
+        eventLoader: (dt) {
+          if (dt.weekday == DateTime.monday) {
+            return ["Driving lesson"];
+          }
+          return [];
+        },
+      ),
+      Expanded(
+        child: ListView.builder(
+            padding: EdgeInsets.all(5),
+            itemCount: 3,
+            itemBuilder: (context, count) => Container(
+                  width: MediaQuery.of(context).size.width,
+                  height: 100,
+                  margin: EdgeInsets.only(top: 2.5, bottom: 2.5),
+                  decoration: BoxDecoration(
+                      border:
+                          Border.all(color: OTPColour.mainTheme, width: 1.5)),
+                )),
+      )
+    ]);
   }
 }
 
