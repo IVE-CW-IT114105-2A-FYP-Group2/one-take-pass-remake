@@ -5,6 +5,10 @@ class APISitemap {
     return Uri.https(_apiUrl, 'signin');
   }
 
+  static Uri get signup {
+    return Uri.https(_apiUrl, 'signup');
+  }
+
   static Uri get postAns {
     return Uri.https(_apiUrl, 'question/ask');
   }

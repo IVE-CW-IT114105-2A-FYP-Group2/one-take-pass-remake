@@ -1,5 +1,7 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_login/flutter_login.dart';
+import 'package:one_take_pass_remake/api/url/localapiurl.dart';
 import 'package:one_take_pass_remake/api/userdata/login_request.dart';
 import 'package:one_take_pass_remake/pages/index.dart';
 
@@ -39,10 +41,50 @@ class OTPLogin extends StatelessWidget {
           int role = -1; //0 = students, 1 = instructor
           String uname = ""; //Username
           //Methods
-          /*Future<int> doSignUp(String phoneNo, String pwd, int gender, int role, String uname) {
-            var dio = Dio();
+          ///Parse filled data to API
+          Future<bool> doSignUp(String phoneNo, String pwd, int gender,
+              int role, String uname) async {
+            //int code to str placeholder
+            String genderInStr;
+            String roleInStr;
 
-          }*/
+            //Convert int code to string
+            //Gender
+            switch (gender) {
+              case 0:
+                genderInStr = "M";
+                break;
+              case 1:
+                genderInStr = "F";
+                break;
+            }
+            //Roles
+            switch (role) {
+              case 0:
+                roleInStr = "student";
+                break;
+              case 1:
+                roleInStr = "privateDrivingInstructor";
+                break;
+            }
+
+            //API caller
+            var dio = Dio();
+            dio.options.headers["Content-Type"] = "application/json";
+            var signUpResp = await dio.post(APISitemap.signup.toString(),
+                data: {
+                  "phoneno": phoneNo,
+                  "username": uname,
+                  "gender": genderInStr,
+                  "type": roleInStr
+                });
+            if (signUpResp.statusCode >= 400) {
+              return false;
+            }
+            //Should be more handler
+            return true;
+          }
+
           //Function behaviours
           await showDialog(
               context: context,
@@ -134,7 +176,9 @@ class OTPLogin extends StatelessWidget {
             return errMsg;
           }
           // When user filled all
-          return null;
+          return await doSignUp(lD.name, lD.password, gender, role, uname)
+              ? null
+              : "There is an error when submitting to server";
         },
         onSubmitAnimationCompleted: () {
           if (_isLogin) {
