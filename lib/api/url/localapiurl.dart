@@ -1,7 +1,6 @@
-///URL of API
-final String _apiUrl = "ivefypgroup2w1offical.azurewebsites.net";
-
 class APISitemap {
+  ///URL of API
+  static final String _apiUrl = "ivefypgroup2w1offical.azurewebsites.net";
   static Uri get signin {
     return Uri.https(_apiUrl, 'signin');
   }
@@ -21,5 +20,9 @@ class APISitemap {
       case 1:
         return Uri.https(_apiUrl, 'question/get/symbol');
     }
+  }
+
+  static Uri customPath(String subDir) {
+    return Uri.https(_apiUrl, subDir);
   }
 }

@@ -30,7 +30,6 @@ class QuestionPageHandler {
 
   static void start(BuildContext context, int mode) {
     new QuestionPageHandler(mode: mode)._loadQuestion().then((qL) {
-      print("Invoked!");
       Navigator.push(context,
           MaterialPageRoute(builder: (context) => QuestionPage(questions: qL)));
     });
