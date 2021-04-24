@@ -26,18 +26,24 @@ class OTPLogin extends StatelessWidget {
     return "Unexpected role";
   }
 
-  //Future<String>
-
   @override
   Widget build(BuildContext context) {
     return FlutterLogin(
         title: "One Take Pass",
         onLogin: _authUser,
         onSignup: (lD) async {
+          //Variable
           String errMsg = null;
-          int stage = 0;
+          //int stage = 0;
           int gender = -1; //0 = male, 1 = female
           int role = -1; //0 = students, 1 = instructor
+          String uname = ""; //Username
+          //Methods
+          /*Future<int> doSignUp(String phoneNo, String pwd, int gender, int role, String uname) {
+            var dio = Dio();
+
+          }*/
+          //Function behaviours
           await showDialog(
               context: context,
               barrierDismissible: false,
@@ -82,11 +88,53 @@ class OTPLogin extends StatelessWidget {
                       )
                     ],
                   ));
+          await showDialog(
+              context: context,
+              barrierDismissible: false,
+              builder: (context) {
+                final _unameIbxCtrl = TextEditingController();
+                return SimpleDialog(
+                  title: Text("Username"),
+                  children: [
+                    Container(
+                      margin: EdgeInsets.all(10),
+                      child: TextField(
+                        controller: _unameIbxCtrl,
+                        textAlign: TextAlign.left,
+                        minLines: 1,
+                        maxLines: 1,
+                        decoration: InputDecoration(hintText: "Username"),
+                      ),
+                    ),
+                    Container(
+                      width: MediaQuery.of(context).size.width,
+                      margin: EdgeInsets.all(5),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          TextButton(
+                            child: Text("Submit"),
+                            onPressed: () {
+                              uname = _unameIbxCtrl.text ?? "";
+                              //Ignore space from start
+                              uname.replaceAll(new RegExp(r"^\s{0,}"), "");
+                              Navigator.pop(context);
+                            },
+                          )
+                        ],
+                      ),
+                    )
+                  ],
+                );
+              });
           _isLogin = false;
-          if (gender == -1 || role == -1) {
+          //When user incompleted sign up required infos
+          if (gender == -1 || role == -1 || uname == "") {
             errMsg = "Please complete all selections of the dialogs";
+            return errMsg;
           }
-          return errMsg;
+          // When user filled all
+          return null;
         },
         onSubmitAnimationCompleted: () {
           if (_isLogin) {
