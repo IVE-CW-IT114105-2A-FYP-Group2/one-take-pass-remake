@@ -14,7 +14,7 @@ class QuestionPageHandler {
     var dio = Dio();
     var _qHttp = await dio.get(APISitemap.getAns(mode).toString());
     List<dynamic> _qR = _qHttp.data;
-    print(_qR);
+    //print(_qR);
     List<Question> _qOs = [];
     switch (mode) {
       case 0:
