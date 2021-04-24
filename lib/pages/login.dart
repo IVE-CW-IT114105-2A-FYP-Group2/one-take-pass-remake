@@ -6,6 +6,7 @@ import 'package:one_take_pass_remake/api/userdata/login_request.dart';
 import 'package:one_take_pass_remake/pages/index.dart';
 
 class OTPLogin extends StatelessWidget {
+  ///Check does user is doing login
   static bool _isLogin = true;
 
   ///Check authencation

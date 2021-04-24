@@ -31,6 +31,7 @@ class QuestionPageHandler {
     return _qOs;
   }
 
+  ///Instance start with API handler
   static void start(BuildContext context, int mode) {
     new QuestionPageHandler(mode: mode)._loadQuestion().then((qL) {
       Navigator.push(context,
