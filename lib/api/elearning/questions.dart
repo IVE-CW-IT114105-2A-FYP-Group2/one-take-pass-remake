@@ -36,7 +36,7 @@ abstract class Question {
   ///
   ///[json] from API
   static Question autoParseFromJSON(Map<String, dynamic> json) {
-    if (json.containsKey("image")) {
+    if (json.containsKey("image") && json["image"] != null) {
       //If the response has image key
       return SymbolQuestion.fromJSON(json);
     }
