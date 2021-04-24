@@ -32,10 +32,15 @@ abstract class Question {
     return _choice;
   }
 
-  static autoParseFromJSON(Map<String, dynamic> json) {
+  ///Automated generating [Question] classes by
+  ///
+  ///[json] from API
+  static Question autoParseFromJSON(Map<String, dynamic> json) {
     if (json.containsKey("image")) {
+      //If the response has image key
       return SymbolQuestion.fromJSON(json);
     }
+    //When image is not provided
     return TextQuestion.fromJSON(json);
   }
 }
