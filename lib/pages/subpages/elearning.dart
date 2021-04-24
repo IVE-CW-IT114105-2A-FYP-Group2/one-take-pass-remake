@@ -70,7 +70,9 @@ Column _writtenTest(BuildContext context) {
       //End text-only question
       Padding(padding: EdgeInsets.all(10)),
       //Symbol questions
-      _elButton(FontAwesomeIcons.road, "Symbol Questions", () {}),
+      _elButton(FontAwesomeIcons.road, "Symbol Questions", () {
+        QuestionPageHandler.start(context, 1);
+      }),
       //End symbol questions
       Padding(padding: EdgeInsets.all(10)),
       //Combine questions

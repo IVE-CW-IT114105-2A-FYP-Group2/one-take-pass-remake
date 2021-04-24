@@ -116,9 +116,9 @@ class SymbolQuestion extends Question {
           style: TextStyle(fontSize: 24),
           textAlign: TextAlign.center,
         ),
-        Padding(padding: EdgeInsets.all(50)),
+        Padding(padding: EdgeInsets.all(20)),
         Image.network(APISitemap.customPath(symbol).toString(),
-            scale: 0.95, alignment: Alignment.center),
+            scale: 1.25, alignment: Alignment.center),
         Container(
             height: 275,
             margin: EdgeInsets.all(5),

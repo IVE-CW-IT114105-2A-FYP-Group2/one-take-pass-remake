@@ -23,6 +23,9 @@ class QuestionPageHandler {
         });
         break;
       case 1:
+        _qR.forEach((q) {
+          _qOs.add(SymbolQuestion.fromJSON(q));
+        });
         break;
     }
     return _qOs;
