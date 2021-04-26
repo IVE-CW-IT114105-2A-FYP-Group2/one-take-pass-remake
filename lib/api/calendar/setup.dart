@@ -109,6 +109,7 @@ abstract class EventAction {
   ///Thus, to ensure [isSuccess] value is correct, this method must contain await if doing async tasks
   Future<void> exec(CalendarApi c);
 
+  ///Indicator that confirm is usable
   bool get isSuccess {
     return success;
   }
