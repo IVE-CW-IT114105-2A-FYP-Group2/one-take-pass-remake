@@ -4,6 +4,7 @@ import 'package:flutter_login/flutter_login.dart';
 import 'package:one_take_pass_remake/api/url/localapiurl.dart';
 import 'package:one_take_pass_remake/api/userdata/login_request.dart';
 import 'package:one_take_pass_remake/pages/index.dart';
+import 'package:one_take_pass_remake/api/misc.dart' show RegexLibraries;
 
 class OTPLogin extends StatelessWidget {
   ///Check does user is doing login
@@ -160,7 +161,8 @@ class OTPLogin extends StatelessWidget {
                             onPressed: () {
                               uname = _unameIbxCtrl.text ?? "";
                               //Ignore space from start
-                              uname.replaceAll(new RegExp(r"^\s{0,}"), "");
+                              uname.replaceAll(
+                                  RegexLibraries.whiteSpaceOnStart, "");
                               Navigator.pop(context);
                             },
                           )

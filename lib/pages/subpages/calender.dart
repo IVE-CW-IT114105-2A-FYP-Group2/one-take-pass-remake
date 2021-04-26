@@ -1,3 +1,4 @@
+import 'package:date_time_picker/date_time_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -16,6 +17,11 @@ class _OTPCalender extends State<OTPCalender> {
 
   //Defile current calender display format
   CalendarFormat _format = CalendarFormat.month;
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,9 +58,6 @@ class _OTPCalender extends State<OTPCalender> {
           });
         },
         eventLoader: (dt) {
-          if (dt.weekday == DateTime.monday) {
-            return ["Driving lesson"];
-          }
           return [];
         },
       ),
@@ -80,26 +83,29 @@ class OTPCalenderEventAdder extends StatefulWidget {
   State<StatefulWidget> createState() => _OTPCalenderEventAdder();
 }
 
-class DaySelect {
-  bool selected = false;
-  String day;
-  DaySelect(String day) {
-    this.day = day;
-  }
-}
-
 class _OTPCalenderEventAdder extends State<OTPCalenderEventAdder> {
-  CheckboxListTile _cbxFactory(DaySelect ds) {
-    return CheckboxListTile(
-      value: ds.selected,
-      onChanged: (bool nv) {
-        setState(() {
-          ds.selected = nv;
-        });
-      },
-      title: Text(ds.day),
-    );
+  Map<String, bool> _selectedDay = {
+    "mon": false,
+    "tue": false,
+    "wed": false,
+    "thur": false,
+    "fri": false,
+    "sat": false,
+    "sun": false
+  };
+
+  Map<String, DateTime> _eventsMap = {
+    //Assume start immediately
+    "start": DateTime.now(),
+    //Assume the event will be held one hour
+    "end": DateTime.now().add(Duration(hours: 1))
+  };
+
+  void _assignDayVal(String day, bool newVal) {
+    _selectedDay[day] = newVal;
   }
+
+  static bool isSubmit = false;
 
   @override
   Widget build(BuildContext context) {
@@ -108,7 +114,27 @@ class _OTPCalenderEventAdder extends State<OTPCalenderEventAdder> {
         actions: [
           TextButton(
               onPressed: () {
-                Navigator.pop(context);
+                if (_eventsMap["end"].isBefore(_eventsMap["start"])) {
+                  showDialog(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                            title: Text("Date setting error"),
+                            content: Text(
+                                "The end date must be set before the start date"),
+                            actions: [
+                              TextButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      isSubmit = false;
+                                    });
+                                    Navigator.pop(context);
+                                  },
+                                  child: Text("OK"))
+                            ],
+                          ));
+                } else {
+                  Navigator.pop(context);
+                }
               },
               child: Text(
                 "Create",
@@ -121,26 +147,116 @@ class _OTPCalenderEventAdder extends State<OTPCalenderEventAdder> {
       body: Container(
         margin: EdgeInsets.all(10),
         child: Column(children: [
-          InputDatePickerFormField(
-            firstDate: DateTime(2020, 1, 1),
-            lastDate: DateTime(2030, 12, 31),
-            fieldLabelText: "Start date",
-          ),
-          InputDatePickerFormField(
-            firstDate: DateTime(2020, 1, 1),
-            lastDate: DateTime(2030, 12, 31),
-            fieldLabelText: "End date",
+          Container(
+            margin: EdgeInsets.only(left: 5, right: 5),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                //Start date
+                Text("From"),
+                DateTimePicker(
+                  type: DateTimePickerType.dateTime,
+                  initialValue: _eventsMap["start"].toString(),
+                  firstDate: DateTime.now(),
+                  lastDate: DateTime.now().add(Duration(
+                      days: (365 * 4))), //Extend 4 years ignore leap day
+                  onChanged: (newDT) {
+                    setState(() {
+                      _eventsMap["start"] = DateTime.parse(newDT);
+                    });
+                  },
+                ),
+                Padding(padding: EdgeInsets.only(top: 2.5, bottom: 2.5)),
+                //End date
+                Text("To"),
+                DateTimePicker(
+                  type: DateTimePickerType.dateTime,
+                  initialValue: _eventsMap["end"].toString(),
+                  firstDate: DateTime.now(),
+                  lastDate: DateTime.now().add(Duration(
+                      days: (365 * 4))), //Extend 4 years ignore leap day
+                  onChanged: (newDT) {
+                    setState(() {
+                      _eventsMap["end"] = DateTime.parse(newDT);
+                    });
+                  },
+                ),
+              ],
+            ),
           ),
           Divider(),
           Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text("On every:"),
-            _cbxFactory(DaySelect("Mon")),
-            _cbxFactory(DaySelect("Tue")),
-            _cbxFactory(DaySelect("Wen")),
-            _cbxFactory(DaySelect("Thur")),
-            _cbxFactory(DaySelect("Fri")),
-            _cbxFactory(DaySelect("Sat")),
-            _cbxFactory(DaySelect("Sun")),
+            Padding(child: Text("On every:"), padding: EdgeInsets.all(10)),
+            CheckboxListTile(
+              value: _selectedDay["mon"],
+              onChanged: (n) {
+                setState(() {
+                  _assignDayVal("mon", n);
+                });
+              },
+              title: Text("Monday"),
+              controlAffinity: ListTileControlAffinity.leading,
+            ),
+            CheckboxListTile(
+              value: _selectedDay["tue"],
+              onChanged: (n) {
+                setState(() {
+                  _assignDayVal("tue", n);
+                });
+              },
+              title: Text("Tuesday"),
+              controlAffinity: ListTileControlAffinity.leading,
+            ),
+            CheckboxListTile(
+              value: _selectedDay["wed"],
+              onChanged: (n) {
+                setState(() {
+                  _assignDayVal("wed", n);
+                });
+              },
+              title: Text("Wednesday"),
+              controlAffinity: ListTileControlAffinity.leading,
+            ),
+            CheckboxListTile(
+              value: _selectedDay["thur"],
+              onChanged: (n) {
+                setState(() {
+                  _assignDayVal("thur", n);
+                });
+              },
+              title: Text("Thursday"),
+              controlAffinity: ListTileControlAffinity.leading,
+            ),
+            CheckboxListTile(
+              value: _selectedDay["fri"],
+              onChanged: (n) {
+                setState(() {
+                  _assignDayVal("fri", n);
+                });
+              },
+              title: Text("Friday"),
+              controlAffinity: ListTileControlAffinity.leading,
+            ),
+            CheckboxListTile(
+              value: _selectedDay["sat"],
+              onChanged: (n) {
+                setState(() {
+                  _assignDayVal("sat", n);
+                });
+              },
+              title: Text("Saturday"),
+              controlAffinity: ListTileControlAffinity.leading,
+            ),
+            CheckboxListTile(
+              value: _selectedDay["sun"],
+              onChanged: (n) {
+                setState(() {
+                  _assignDayVal("sun", n);
+                });
+              },
+              title: Text("Sunday"),
+              controlAffinity: ListTileControlAffinity.leading,
+            ),
           ])
         ]),
       ),
