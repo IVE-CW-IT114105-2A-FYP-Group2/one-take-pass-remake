@@ -122,8 +122,16 @@ class SymbolQuestion extends Question {
           textAlign: TextAlign.center,
         ),
         Padding(padding: EdgeInsets.all(20)),
-        Image.network(APISitemap.customPath(symbol).toString(),
-            scale: 1.25, alignment: Alignment.center),
+        Container(
+          width: 200,
+          height: 200,
+          decoration: BoxDecoration(
+              image: DecorationImage(
+                  image: NetworkImage(
+                    APISitemap.customPath(symbol).toString(),
+                  ),
+                  fit: BoxFit.contain)),
+        ),
         Container(
             height: 275,
             margin: EdgeInsets.all(5),

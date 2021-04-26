@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'package:intl/intl.dart';
+import 'package:one_take_pass_remake/api/calendar/insert.dart';
+import 'package:one_take_pass_remake/api/calendar/setup.dart';
+import 'package:one_take_pass_remake/api/misc.dart' show RegexLibraries;
 import 'package:one_take_pass_remake/themes.dart';
 import 'package:table_calendar/table_calendar.dart';
 
@@ -79,6 +82,16 @@ class _OTPCalender extends State<OTPCalender> {
 }
 
 class OTPCalenderEventAdder extends StatefulWidget {
+  void addEvent(String summary, DateTime start, DateTime end,
+      [List<String> attendees]) {
+    InsertEvent(
+        eventsInfos: EventFactory(
+            summary: summary,
+            start: EventDuration(datetime: start),
+            end: EventDuration(datetime: end),
+            attendeesEmails: attendees ?? []));
+  }
+
   @override
   State<StatefulWidget> createState() => _OTPCalenderEventAdder();
 }
@@ -94,6 +107,8 @@ class _OTPCalenderEventAdder extends State<OTPCalenderEventAdder> {
     "sun": false
   };
 
+  Map<String, TextEditingController> _controllers;
+
   Map<String, DateTime> _eventsMap = {
     //Assume start immediately
     "start": DateTime.now(),
@@ -105,7 +120,22 @@ class _OTPCalenderEventAdder extends State<OTPCalenderEventAdder> {
     _selectedDay[day] = newVal;
   }
 
-  static bool isSubmit = false;
+  @override
+  void initState() {
+    super.initState();
+    _controllers = {
+      "summary": TextEditingController(),
+      "attendees": TextEditingController()
+    };
+  }
+
+  @override
+  void dispose() {
+    _controllers.forEach((_, value) {
+      value.dispose();
+    });
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -124,15 +154,21 @@ class _OTPCalenderEventAdder extends State<OTPCalenderEventAdder> {
                             actions: [
                               TextButton(
                                   onPressed: () {
-                                    setState(() {
-                                      isSubmit = false;
-                                    });
                                     Navigator.pop(context);
                                   },
                                   child: Text("OK"))
                             ],
                           ));
                 } else {
+                  List<String> getEmailListStr() {
+                    return _controllers["attendees"].text.split(',');
+                  }
+
+                  widget.addEvent(
+                      _controllers["summary"].text,
+                      _eventsMap["start"],
+                      _eventsMap["end"],
+                      getEmailListStr());
                   Navigator.pop(context);
                 }
               },
@@ -146,12 +182,23 @@ class _OTPCalenderEventAdder extends State<OTPCalenderEventAdder> {
       ),
       body: Container(
         margin: EdgeInsets.all(10),
-        child: Column(children: [
+        child: ListView(children: [
           Container(
             margin: EdgeInsets.only(left: 5, right: 5),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Text("Title"),
+                TextField(
+                  controller: _controllers["summary"],
+                  inputFormatters: [
+                    FilteringTextInputFormatter.singleLineFormatter
+                  ],
+                  maxLength: 255,
+                  maxLines: 1,
+                  minLines: 1,
+                ),
+                Divider(),
                 //Start date
                 Text("From"),
                 DateTimePicker(
@@ -187,77 +234,106 @@ class _OTPCalenderEventAdder extends State<OTPCalenderEventAdder> {
           Divider(),
           Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Padding(child: Text("On every:"), padding: EdgeInsets.all(10)),
-            CheckboxListTile(
-              value: _selectedDay["mon"],
-              onChanged: (n) {
-                setState(() {
-                  _assignDayVal("mon", n);
-                });
-              },
-              title: Text("Monday"),
-              controlAffinity: ListTileControlAffinity.leading,
+            Container(
+                margin: EdgeInsets.only(bottom: 5),
+                height: 150,
+                width: MediaQuery.of(context).size.width,
+                child: ListView(children: [
+                  CheckboxListTile(
+                    value: _selectedDay["mon"],
+                    onChanged: (n) {
+                      setState(() {
+                        _assignDayVal("mon", n);
+                      });
+                    },
+                    title: Text("Monday"),
+                    controlAffinity: ListTileControlAffinity.leading,
+                  ),
+                  CheckboxListTile(
+                    value: _selectedDay["tue"],
+                    onChanged: (n) {
+                      setState(() {
+                        _assignDayVal("tue", n);
+                      });
+                    },
+                    title: Text("Tuesday"),
+                    controlAffinity: ListTileControlAffinity.leading,
+                  ),
+                  CheckboxListTile(
+                    value: _selectedDay["wed"],
+                    onChanged: (n) {
+                      setState(() {
+                        _assignDayVal("wed", n);
+                      });
+                    },
+                    title: Text("Wednesday"),
+                    controlAffinity: ListTileControlAffinity.leading,
+                  ),
+                  CheckboxListTile(
+                    value: _selectedDay["thur"],
+                    onChanged: (n) {
+                      setState(() {
+                        _assignDayVal("thur", n);
+                      });
+                    },
+                    title: Text("Thursday"),
+                    controlAffinity: ListTileControlAffinity.leading,
+                  ),
+                  CheckboxListTile(
+                    value: _selectedDay["fri"],
+                    onChanged: (n) {
+                      setState(() {
+                        _assignDayVal("fri", n);
+                      });
+                    },
+                    title: Text("Friday"),
+                    controlAffinity: ListTileControlAffinity.leading,
+                  ),
+                  CheckboxListTile(
+                    value: _selectedDay["sat"],
+                    onChanged: (n) {
+                      setState(() {
+                        _assignDayVal("sat", n);
+                      });
+                    },
+                    title: Text("Saturday"),
+                    controlAffinity: ListTileControlAffinity.leading,
+                  ),
+                  CheckboxListTile(
+                    value: _selectedDay["sun"],
+                    onChanged: (n) {
+                      setState(() {
+                        _assignDayVal("sun", n);
+                      });
+                    },
+                    title: Text("Sunday"),
+                    controlAffinity: ListTileControlAffinity.leading,
+                  )
+                ])),
+          ]),
+          Divider(),
+          Container(
+            padding: EdgeInsets.only(left: 5, right: 5),
+            margin: EdgeInsets.only(top: 5),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text("Attendees' email address:"),
+                TextField(
+                  controller: _controllers["attendees"],
+                  decoration: InputDecoration(
+                      hintText:
+                          "Use ',' to sperate multiple email address if needed",
+                      hintStyle: TextStyle(fontSize: 12)),
+                  maxLines: 1,
+                  minLines: 1,
+                  inputFormatters: [
+                    FilteringTextInputFormatter.singleLineFormatter
+                  ],
+                )
+              ],
             ),
-            CheckboxListTile(
-              value: _selectedDay["tue"],
-              onChanged: (n) {
-                setState(() {
-                  _assignDayVal("tue", n);
-                });
-              },
-              title: Text("Tuesday"),
-              controlAffinity: ListTileControlAffinity.leading,
-            ),
-            CheckboxListTile(
-              value: _selectedDay["wed"],
-              onChanged: (n) {
-                setState(() {
-                  _assignDayVal("wed", n);
-                });
-              },
-              title: Text("Wednesday"),
-              controlAffinity: ListTileControlAffinity.leading,
-            ),
-            CheckboxListTile(
-              value: _selectedDay["thur"],
-              onChanged: (n) {
-                setState(() {
-                  _assignDayVal("thur", n);
-                });
-              },
-              title: Text("Thursday"),
-              controlAffinity: ListTileControlAffinity.leading,
-            ),
-            CheckboxListTile(
-              value: _selectedDay["fri"],
-              onChanged: (n) {
-                setState(() {
-                  _assignDayVal("fri", n);
-                });
-              },
-              title: Text("Friday"),
-              controlAffinity: ListTileControlAffinity.leading,
-            ),
-            CheckboxListTile(
-              value: _selectedDay["sat"],
-              onChanged: (n) {
-                setState(() {
-                  _assignDayVal("sat", n);
-                });
-              },
-              title: Text("Saturday"),
-              controlAffinity: ListTileControlAffinity.leading,
-            ),
-            CheckboxListTile(
-              value: _selectedDay["sun"],
-              onChanged: (n) {
-                setState(() {
-                  _assignDayVal("sun", n);
-                });
-              },
-              title: Text("Sunday"),
-              controlAffinity: ListTileControlAffinity.leading,
-            ),
-          ])
+          )
         ]),
       ),
     );
