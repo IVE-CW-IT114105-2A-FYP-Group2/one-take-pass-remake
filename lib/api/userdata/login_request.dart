@@ -14,13 +14,13 @@ class UserREST {
 
   factory UserREST.fromJSON(Map<String, dynamic> json) {
     return UserREST(
-        phoneNo: json['phoneNo'].toString(),
+        phoneNo: json['phoneNo'],
         roles: json['type'],
         fullName: json['u_name']);
   }
 
   Map<String, dynamic> toJson() =>
-      {'phoneNo': int.tryParse(phoneNo), 'type': roles, 'u_name': fullName};
+      {'phoneNo': phoneNo, 'type': roles, 'u_name': fullName};
 }
 
 class UserInfoHandler {
