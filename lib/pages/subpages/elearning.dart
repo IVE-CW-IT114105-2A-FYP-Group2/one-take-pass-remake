@@ -1,8 +1,5 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:one_take_pass_remake/api/elearning/questions.dart';
-import 'package:one_take_pass_remake/api/url/localapiurl.dart';
 import 'package:one_take_pass_remake/api/url/types.dart';
 import 'package:one_take_pass_remake/pages/reusable/qna.dart';
 import 'package:one_take_pass_remake/themes.dart';
@@ -65,13 +62,13 @@ Column _writtenTest(BuildContext context) {
       _subTitle("Written Test"),
       //Text-only questions
       _elButton(FontAwesomeIcons.wordpressSimple, "Text-only Questions", () {
-        QuestionPageHandler.start(context, 0);
+        QuestionPageHandler.start(context, 0, false);
       }),
       //End text-only question
       Padding(padding: EdgeInsets.all(10)),
       //Symbol questions
       _elButton(FontAwesomeIcons.road, "Symbol Questions", () {
-        QuestionPageHandler.start(context, 1);
+        QuestionPageHandler.start(context, 1, false);
       }),
       //End symbol questions
       Padding(padding: EdgeInsets.all(10)),

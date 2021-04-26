@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:one_take_pass_remake/api/elearning/questions.dart';
@@ -32,10 +34,15 @@ class QuestionPageHandler {
   }
 
   ///Instance start with API handler
-  static void start(BuildContext context, int mode) {
+  static void start(BuildContext context, int mode, bool isMock) {
     new QuestionPageHandler(mode: mode)._loadQuestion().then((qL) {
-      Navigator.push(context,
-          MaterialPageRoute(builder: (context) => QuestionPage(questions: qL)));
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => QuestionPage(
+                    questions: qL,
+                    mockMode: isMock,
+                  )));
     });
   }
 }
@@ -44,23 +51,27 @@ class QuestionPageHandler {
 class QuestionPage extends StatefulWidget {
   final List<Question> questions;
 
-  QuestionPage({@required this.questions});
+  ///Mock exam mode
+  final bool mockMode;
+
+  QuestionPage({@required this.questions, @required this.mockMode});
 
   @override
-  State<StatefulWidget> createState() => _QuestionPage();
+  State<StatefulWidget> createState() =>
+      mockMode ? _MockExamQuestion() : _PractiseQuestion();
 }
 
 ///UI of QuestionPage
-class _QuestionPage extends State<QuestionPage> {
+abstract class _QuestionPage extends State<QuestionPage> {
   static bool _isTesting = true;
-  List<Question> _qS;
+  Queue<Question> _qS;
   Question _q;
   int correctCount = 0, totalQuestion;
 
   ///Toggle next question
   void _nextQuestion() {
     try {
-      _q = _qS.removeLast();
+      _q = _qS.removeFirst();
     } catch (ended) {
       _q = null;
     }
@@ -74,21 +85,17 @@ class _QuestionPage extends State<QuestionPage> {
 
   @override
   void initState() {
-    _qS = widget.questions;
+    _qS = Queue.from(widget.questions);
     totalQuestion = widget.questions.length;
     super.initState();
     _nextQuestion();
   }
 
-  ///To listen the behaviour of answer review page
-  void _ansReviewedListener(bool terminate) {
-    if (terminate) {
-      _isTesting = false;
-      Navigator.pop(context);
-    } else {
-      _nextQuestion();
-    }
-  }
+  ///When user ask correct answer
+  void onCorrect();
+
+  ///When user ask wrong answer with [actualAnswer]
+  void onWrong(String actualAnswer);
 
   ///Display data on this test when all question is asked
   Widget _allDonePage() {
@@ -150,22 +157,7 @@ class _QuestionPage extends State<QuestionPage> {
           "Question " + _questionNo.toString(),
           style: TextStyle(fontSize: 36, fontWeight: FontWeight.w300),
         ),
-        q.interface(() {
-          correctCount++;
-          Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => _CorrectAns()))
-              .then((isExit) {
-            _ansReviewedListener(isExit as bool);
-          });
-        }, (String actual) {
-          Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => _IncorrectAns(actual: actual)))
-              .then((isExit) {
-            _ansReviewedListener(isExit as bool);
-          });
-        })
+        q.interface(onCorrect, onWrong)
       ],
     );
   }
@@ -205,6 +197,54 @@ class _QuestionPage extends State<QuestionPage> {
                   ));
           return _exit;
         });
+  }
+}
+
+///A question page that for practise purpose with showing is picked correct answer
+class _PractiseQuestion extends _QuestionPage {
+  ///To listen the behaviour of answer review page
+  void _ansReviewedListener(bool terminate) {
+    if (terminate) {
+      _QuestionPage._isTesting = false;
+      Navigator.pop(context);
+    } else {
+      _nextQuestion();
+    }
+  }
+
+  @override
+  void onCorrect() {
+    correctCount++;
+    Navigator.push(
+            context, MaterialPageRoute(builder: (context) => _CorrectAns()))
+        .then((isExit) {
+      _ansReviewedListener(isExit as bool);
+    });
+  }
+
+  @override
+  void onWrong(String actualAnswer) {
+    Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => _IncorrectAns(actual: actualAnswer)))
+        .then((isExit) {
+      _ansReviewedListener(isExit as bool);
+    });
+  }
+}
+
+///A page that disabled reviewing answer and look like a exam
+class _MockExamQuestion extends _QuestionPage {
+  @override
+  void onCorrect() {
+    correctCount++;
+    _nextQuestion();
+  }
+
+  @override
+  void onWrong(String _) {
+    _nextQuestion();
   }
 }
 
