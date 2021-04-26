@@ -98,7 +98,8 @@ class ClientSetup {
 ///A class that handling all action
 abstract class EventAction {
   bool success = false;
-  EventAction() {
+
+  Future<void> run() {
     ClientSetup.apiInit().then((capi) {
       exec(capi);
     });

@@ -1,9 +1,11 @@
 import 'package:date_time_picker/date_time_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:googleapis/calendar/v3.dart';
 
 import 'package:intl/intl.dart';
 import 'package:one_take_pass_remake/api/calendar/insert.dart';
+import 'package:one_take_pass_remake/api/calendar/list_event.dart';
 import 'package:one_take_pass_remake/api/calendar/setup.dart';
 import 'package:one_take_pass_remake/api/misc.dart' show RegexLibraries;
 import 'package:one_take_pass_remake/themes.dart';
@@ -21,6 +23,12 @@ class _OTPCalender extends State<OTPCalender> {
   //Defile current calender display format
   CalendarFormat _format = CalendarFormat.month;
 
+  Future<Events> getEvents() async {
+    ListEvents lE = ListEvents();
+    await lE.run();
+    return lE.cues;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -29,7 +37,7 @@ class _OTPCalender extends State<OTPCalender> {
   @override
   Widget build(BuildContext context) {
     return Column(children: [
-      TableCalendar(
+      TableCalendar<Event>(
         calendarBuilders: CalendarBuilders(headerTitleBuilder: (context, dt) {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -83,13 +91,14 @@ class _OTPCalender extends State<OTPCalender> {
 
 class OTPCalenderEventAdder extends StatefulWidget {
   void addEvent(String summary, DateTime start, DateTime end,
-      [List<String> attendees]) {
-    InsertEvent(
+      [List<String> attendees]) async {
+    InsertEvent iE = InsertEvent(
         eventsInfos: EventFactory(
             summary: summary,
             start: EventDuration(datetime: start),
             end: EventDuration(datetime: end),
             attendeesEmails: attendees ?? []));
+    await iE.run();
   }
 
   @override
