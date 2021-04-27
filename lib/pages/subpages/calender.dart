@@ -23,12 +23,6 @@ class _OTPCalender extends State<OTPCalender> {
   //Defile current calender display format
   CalendarFormat _format = CalendarFormat.month;
 
-  Future<Events> getEvents() async {
-    ListEvents lE = ListEvents();
-    await lE.run();
-    return lE.cues;
-  }
-
   @override
   void initState() {
     super.initState();
@@ -37,7 +31,7 @@ class _OTPCalender extends State<OTPCalender> {
   @override
   Widget build(BuildContext context) {
     return Column(children: [
-      TableCalendar<Event>(
+      TableCalendar(
         calendarBuilders: CalendarBuilders(headerTitleBuilder: (context, dt) {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -90,22 +84,12 @@ class _OTPCalender extends State<OTPCalender> {
 }
 
 class OTPCalenderEventAdder extends StatefulWidget {
-  void addEvent(String summary, DateTime start, DateTime end,
-      [List<String> attendees]) async {
-    InsertEvent iE = InsertEvent(
-        eventsInfos: EventFactory(
-            summary: summary,
-            start: EventDuration(datetime: start),
-            end: EventDuration(datetime: end),
-            attendeesEmails: attendees ?? []));
-    await iE.run();
-  }
-
   @override
   State<StatefulWidget> createState() => _OTPCalenderEventAdder();
 }
 
 class _OTPCalenderEventAdder extends State<OTPCalenderEventAdder> {
+  ///Selected which day will repeated
   Map<String, bool> _selectedDay = {
     "mon": false,
     "tue": false,
@@ -173,12 +157,33 @@ class _OTPCalenderEventAdder extends State<OTPCalenderEventAdder> {
                     return _controllers["attendees"].text.split(',');
                   }
 
-                  widget.addEvent(
-                      _controllers["summary"].text,
-                      _eventsMap["start"],
-                      _eventsMap["end"],
-                      getEmailListStr());
-                  Navigator.pop(context);
+                  InsertEvent(
+                          from: _eventsMap["start"],
+                          to: _eventsMap["end"],
+                          summary: _controllers["summary"].text,
+                          repeatDay: _selectedDay,
+                          attendees: getEmailListStr())
+                      .run()
+                      .then((isSuccess) {
+                    if (!isSuccess) {
+                      throw "Unable inserting event to Google API";
+                    }
+                  }).then((_) {
+                    Navigator.pop(context);
+                  }).onError((_, __) {
+                    showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                              title: Text("Failed to insert events"),
+                              actions: [
+                                TextButton(
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    },
+                                    child: Text("OK")),
+                              ],
+                            ));
+                  });
                 }
               },
               child: Text(
@@ -211,7 +216,7 @@ class _OTPCalenderEventAdder extends State<OTPCalenderEventAdder> {
                 //Start date
                 Text("From"),
                 DateTimePicker(
-                  type: DateTimePickerType.dateTime,
+                  type: DateTimePickerType.dateTimeSeparate,
                   initialValue: _eventsMap["start"].toString(),
                   firstDate: DateTime.now(),
                   lastDate: DateTime.now().add(Duration(
@@ -226,7 +231,7 @@ class _OTPCalenderEventAdder extends State<OTPCalenderEventAdder> {
                 //End date
                 Text("To"),
                 DateTimePicker(
-                  type: DateTimePickerType.dateTime,
+                  type: DateTimePickerType.dateTimeSeparate,
                   initialValue: _eventsMap["end"].toString(),
                   firstDate: DateTime.now(),
                   lastDate: DateTime.now().add(Duration(
