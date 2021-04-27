@@ -30,7 +30,7 @@ class InstructorInfo extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        _img(instructor.avater),
+        _img(""),
         Padding(padding: EdgeInsets.only(right: 10)),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -39,7 +39,7 @@ class InstructorInfo extends StatelessWidget {
               instructor.name,
               style: TextStyle(fontSize: 24),
             ),
-            InstructorRating(context: context, rate: instructor.rating)
+            //InstructorRating(context: context, rate: instructor.rating)
           ],
         )
       ],
@@ -63,10 +63,10 @@ class InstructorInfo extends StatelessWidget {
               style: TextStyle(fontWeight: FontWeight.w500, fontSize: 24)),
           Text("Personality: " + PersonalityGetter(instructor.personality).str,
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400)),
-          Text(
+          /*Text(
               "Language: " +
                   SpeakingLanguageGetter(instructor.speakingLanguage).str,
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w300)),
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w300)),*/
           Text("District: " + HKDistrictGetter(instructor.hkDistrict).str,
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.w300)),
           Text("Vehicles: " + instructor.vehicles,

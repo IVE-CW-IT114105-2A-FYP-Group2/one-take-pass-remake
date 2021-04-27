@@ -115,11 +115,7 @@ class _SearchList extends StatelessWidget {
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      (snapshot.data[count].avater != "")
-                          ? CircleAvatar(
-                              foregroundImage:
-                                  NetworkImage(snapshot.data[count].avater))
-                          : Icon(Icons.person, size: 36),
+                      Icon(Icons.person, size: 36),
                       Text(snapshot.data[count].name,
                           style: TextStyle(fontSize: 24))
                     ],

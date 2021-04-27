@@ -12,42 +12,23 @@ export 'package:one_take_pass_remake/api/userdata/gender.dart';
 
 class OTPUsers {
   String name;
-  Genders gender;
-  String avater;
 
-  OTPUsers(String name, Genders gender, [String avater = ""]) {
+  OTPUsers(String name) {
     this.name = name;
-    this.gender = gender;
-    this.avater = avater;
   }
 }
 
 class Instructor extends OTPUsers {
   String desc;
-  double rating;
   Personality personality;
-  SpeakingLanguage speakingLanguage;
   HKDistrict hkDistrict;
   String vehicles;
 
-  Instructor(
-      String name,
-      String desc,
-      double rating,
-      Personality personality,
-      SpeakingLanguage speakingLanguage,
-      HKDistrict hkDistrict,
-      String vehicles,
-      Genders gender,
-      [String avater = ""])
-      : super(name, gender, avater) {
-    if (rating > 5 || rating < 0) {
-      throw new RangeError("Rating range must between 0 to 5");
-    }
+  Instructor(String name, String desc, Personality personality,
+      SpeakingLanguage speakingLanguage, HKDistrict hkDistrict, String vehicles)
+      : super(name) {
     this.desc = desc;
-    this.rating = rating;
     this.personality = personality;
-    this.speakingLanguage = speakingLanguage;
     this.hkDistrict = hkDistrict;
     this.vehicles = vehicles;
   }
@@ -55,23 +36,20 @@ class Instructor extends OTPUsers {
   static List<Instructor> get dummyInstructor {
     return [
       Instructor(
-          "John Siu",
-          "Serious",
-          3,
-          Personality.calm,
-          SpeakingLanguage.cantonese,
-          HKDistrict.est,
-          "Private Car",
-          Genders.male),
+        "John Siu",
+        "Serious",
+        Personality.calm,
+        SpeakingLanguage.cantonese,
+        HKDistrict.est,
+        "Private Car",
+      ),
       Instructor(
         "Polly Chan",
         "I love cars",
-        4,
         Personality.easy_going,
         SpeakingLanguage.cantonese,
         HKDistrict.ssp,
         "Private Car",
-        Genders.female,
       )
     ];
   }
