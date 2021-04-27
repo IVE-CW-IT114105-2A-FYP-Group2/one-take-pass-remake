@@ -25,12 +25,21 @@ class Instructor extends OTPUsers {
   String vehicles;
 
   Instructor(String name, String desc, Personality personality,
-      SpeakingLanguage speakingLanguage, HKDistrict hkDistrict, String vehicles)
+      HKDistrict hkDistrict, String vehicles)
       : super(name) {
     this.desc = desc;
     this.personality = personality;
     this.hkDistrict = hkDistrict;
     this.vehicles = vehicles;
+  }
+
+  factory Instructor.fromJSON(Map<String, dynamic> json) {
+    return Instructor(
+        json["name"],
+        json["description"],
+        PersonalityGetter.getEnumObj(json["instructorStyle"]),
+        HKDistrictGetter.getEnumObj(json["location"]),
+        json["vehicleType"]);
   }
 
   static List<Instructor> get dummyInstructor {
@@ -39,7 +48,6 @@ class Instructor extends OTPUsers {
         "John Siu",
         "Serious",
         Personality.calm,
-        SpeakingLanguage.cantonese,
         HKDistrict.est,
         "Private Car",
       ),
@@ -47,7 +55,6 @@ class Instructor extends OTPUsers {
         "Polly Chan",
         "I love cars",
         Personality.easy_going,
-        SpeakingLanguage.cantonese,
         HKDistrict.ssp,
         "Private Car",
       )
