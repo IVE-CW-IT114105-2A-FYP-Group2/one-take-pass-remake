@@ -100,6 +100,7 @@ extension HKDistrictGetter on HKDistrict {
   }
 
   static HKDistrict getEnumObj(String str) {
+    //Return central and western if the short form is not defined
     return HKDistrict.values.firstWhere(
         (e) =>
             e.toString().toLowerCase() == ("HKDistrict." + str).toLowerCase(),
