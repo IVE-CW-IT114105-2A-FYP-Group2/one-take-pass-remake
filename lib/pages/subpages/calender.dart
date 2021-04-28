@@ -84,14 +84,20 @@ class _OTPCalender extends State<OTPCalender> {
                   });
                 },
                 eventLoader: (dt) {
-                  return receivedEvents.where((eventInfo) {
-                    EventDateTime eDT = eventInfo.start;
-                    String dateAsStr = DateFormat(DateFormat.YEAR_NUM_MONTH_DAY)
-                        .format(eDT.date ??
-                            eDT.dateTime); //Pick the date that is not null
-                    return dateAsStr ==
-                        DateFormat(DateFormat.YEAR_NUM_MONTH_DAY).format(dt);
-                  }).toList();
+                  try {
+                    return receivedEvents.where((eventInfo) {
+                      EventDateTime eDT = eventInfo.start;
+                      String dateAsStr =
+                          DateFormat(DateFormat.YEAR_NUM_MONTH_DAY).format(eDT
+                                  .date ??
+                              eDT.dateTime); //Pick the date that is not null
+                      return dateAsStr ==
+                          DateFormat(DateFormat.YEAR_NUM_MONTH_DAY).format(dt);
+                    }).toList();
+                  } catch (filter_error) {
+                    //If caught error as moy be no event found
+                    return [];
+                  }
                 },
               ),
               Expanded(
