@@ -159,6 +159,7 @@ class OTPCalenderEventAdder extends StatefulWidget {
   State<StatefulWidget> createState() => _OTPCalenderEventAdder();
 }
 
+///An interface that add a event to Google Calendar
 class _OTPCalenderEventAdder extends State<OTPCalenderEventAdder> {
   ///Selected which day will repeated
   Map<String, bool> _selectedDay = {
@@ -171,8 +172,10 @@ class _OTPCalenderEventAdder extends State<OTPCalenderEventAdder> {
     "sun": false
   };
 
+  ///Controller for [TextField]
   Map<String, TextEditingController> _controllers;
 
+  ///A mapped object that define start and end
   Map<String, DateTime> _eventsMap = {
     //Assume start immediately
     "start": DateTime.now(),
@@ -180,6 +183,7 @@ class _OTPCalenderEventAdder extends State<OTPCalenderEventAdder> {
     "end": DateTime.now().add(Duration(hours: 1))
   };
 
+  ///A lazy way to assign [_selectedDay] to define repeated day
   void _assignDayVal(String day, bool newVal) {
     _selectedDay[day] = newVal;
   }
@@ -259,8 +263,33 @@ class _OTPCalenderEventAdder extends State<OTPCalenderEventAdder> {
               print("Event added");
             }
           });
+          showDialog(
+              context: context,
+              builder: (context) => AlertDialog(
+                    title: Text("The new event has been created"),
+                    actions: [
+                      TextButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          child: Text("OK"))
+                    ],
+                  )).then((_) {
+            Navigator.pop(context);
+          });
         } catch (insert_failed) {
-          print(insert_failed);
+          showDialog(
+              context: context,
+              builder: (context) => AlertDialog(
+                    title: Text("Unable to insert new event"),
+                    actions: [
+                      TextButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          child: Text("OK"))
+                    ],
+                  ));
         }
         //if (!await assignSingleEvent(capi, sDE)) {
         //  return false;
@@ -313,20 +342,6 @@ class _OTPCalenderEventAdder extends State<OTPCalenderEventAdder> {
                   //Insert event handler
                   _CApiManager.grant.then((capi) {
                     insertEvent(capi);
-                    showDialog(
-                        context: context,
-                        builder: (context) => AlertDialog(
-                              title: Text("The new event has been created"),
-                              actions: [
-                                TextButton(
-                                    onPressed: () {
-                                      Navigator.pop(context);
-                                    },
-                                    child: Text("OK"))
-                              ],
-                            )).then((_) {
-                      Navigator.pop(context);
-                    });
                   });
 
                   /*InsertEvent(
