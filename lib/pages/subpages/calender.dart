@@ -1,15 +1,30 @@
+import 'dart:async';
+
 import 'package:date_time_picker/date_time_picker.dart';
+import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:googleapis/calendar/v3.dart';
 
-import 'package:intl/intl.dart';
-import 'package:one_take_pass_remake/api/calendar/insert.dart';
-import 'package:one_take_pass_remake/api/calendar/list_event.dart';
+import 'package:intl/intl.dart' show DateFormat;
 import 'package:one_take_pass_remake/api/calendar/setup.dart';
 import 'package:one_take_pass_remake/api/misc.dart' show RegexLibraries;
 import 'package:one_take_pass_remake/themes.dart';
 import 'package:table_calendar/table_calendar.dart';
+
+class _CApiManager {
+  static CalendarApi _capi = null;
+  static Future<CalendarApi> get grant async {
+    if (_capi == null) {
+      _capi = await new GCalAPIHandler().getGranted();
+    }
+    return _capi;
+  }
+}
+
+Future<List<Event>> _cuEvents = Future.value(_CApiManager.grant
+    .then((capi) => capi.events.list(GCalAPIHandler.calId))
+    .then((value) => value.items));
 
 class OTPCalender extends StatefulWidget {
   @override
@@ -28,58 +43,106 @@ class _OTPCalender extends State<OTPCalender> {
     super.initState();
   }
 
+  ///All interface about calendar
+  Widget calendarInterface(BuildContext context, List<Event> receivedEvents) {
+    return StatefulBuilder(
+        builder: (context, setState) => Column(children: [
+              TableCalendar(
+                calendarBuilders:
+                    CalendarBuilders(headerTitleBuilder: (context, dt) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(dt.year.toString(),
+                          style: TextStyle(
+                              fontSize: 12, fontWeight: FontWeight.w300)),
+                      Text(DateFormat("MMMM").format(dt),
+                          style: TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.w700))
+                    ],
+                  );
+                }),
+                focusedDay: _focusedDate,
+                firstDay: DateTime((DateTime.now().year - 3), 1, 1),
+                lastDay: DateTime((DateTime.now().year + 3), 12, 31),
+                selectedDayPredicate: (date) => isSameDay(_selectedDate, date),
+                onDaySelected: (selected, focused) {
+                  setState(() {
+                    _selectedDate = selected;
+                    _focusedDate = focused;
+                  });
+                },
+                calendarFormat: _format,
+                onPageChanged: (focused) {
+                  setState(() {
+                    _focusedDate = focused;
+                  });
+                },
+                onFormatChanged: (format) {
+                  setState(() {
+                    _format = format;
+                  });
+                },
+                eventLoader: (dt) {
+                  return receivedEvents.where((eventInfo) {
+                    EventDateTime eDT = eventInfo.start;
+                    String dateAsStr = DateFormat(DateFormat.YEAR_NUM_MONTH_DAY)
+                        .format(eDT.date ??
+                            eDT.dateTime); //Pick the date that is not null
+                    return dateAsStr ==
+                        DateFormat(DateFormat.YEAR_NUM_MONTH_DAY).format(dt);
+                  }).toList();
+                },
+              ),
+              Expanded(
+                child: ListView.builder(
+                    padding: EdgeInsets.all(5),
+                    itemCount: 3,
+                    itemBuilder: (context, count) => Container(
+                          width: MediaQuery.of(context).size.width,
+                          height: 100,
+                          margin: EdgeInsets.only(top: 2.5, bottom: 2.5),
+                          decoration: BoxDecoration(
+                              border: Border.all(
+                                  color: OTPColour.mainTheme, width: 1.5)),
+                        )),
+              )
+            ]));
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Column(children: [
-      TableCalendar(
-        calendarBuilders: CalendarBuilders(headerTitleBuilder: (context, dt) {
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(dt.year.toString(),
-                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w300)),
-              Text(DateFormat("MMMM").format(dt),
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700))
-            ],
-          );
-        }),
-        focusedDay: _focusedDate,
-        firstDay: DateTime((DateTime.now().year - 3), 1, 1),
-        lastDay: DateTime((DateTime.now().year + 3), 12, 31),
-        selectedDayPredicate: (date) => isSameDay(_selectedDate, date),
-        onDaySelected: (selected, focused) {
-          setState(() {
-            _selectedDate = selected;
-            _focusedDate = focused;
-          });
-        },
-        calendarFormat: _format,
-        onPageChanged: (focused) {
-          _focusedDate = focused;
-        },
-        onFormatChanged: (format) {
-          setState(() {
-            _format = format;
-          });
-        },
-        eventLoader: (dt) {
-          return [];
-        },
-      ),
-      Expanded(
-        child: ListView.builder(
-            padding: EdgeInsets.all(5),
-            itemCount: 3,
-            itemBuilder: (context, count) => Container(
-                  width: MediaQuery.of(context).size.width,
-                  height: 100,
-                  margin: EdgeInsets.only(top: 2.5, bottom: 2.5),
-                  decoration: BoxDecoration(
-                      border:
-                          Border.all(color: OTPColour.mainTheme, width: 1.5)),
-                )),
-      )
-    ]);
+    return FutureBuilder<List<Event>>(
+        future: _cuEvents,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(
+              child: Column(
+                children: [
+                  Text("Getting your calendar..."),
+                  CircularProgressIndicator()
+                ],
+              ),
+            );
+          } else {
+            if (snapshot.hasData) {
+              print(snapshot.data);
+              return calendarInterface(context, snapshot.data);
+            } else {
+              return Center(
+                child: Column(
+                  children: [
+                    Text("Unable to get your calendar"),
+                    Icon(
+                      CupertinoIcons.xmark_circle,
+                      size: 120,
+                    )
+                  ],
+                ),
+              );
+            }
+          }
+        });
   }
 }
 
@@ -111,6 +174,92 @@ class _OTPCalenderEventAdder extends State<OTPCalenderEventAdder> {
 
   void _assignDayVal(String day, bool newVal) {
     _selectedDay[day] = newVal;
+  }
+
+  void insertEvent(CalendarApi capi) {
+    List<String> getEmailListStr() {
+      List<String> validAddr = [];
+      List<String> inputAddr = _controllers["attendees"].text.split(',');
+      inputAddr.forEach((a) {
+        if (RegexLibraries.emailPattern.hasMatch(a)) {
+          validAddr.add(a);
+        }
+      });
+      return validAddr;
+    }
+
+    ///Set timezone in Hong Kong
+    final String timezone = "GMT+08:00";
+
+    ///Convert Map's key to DateTime's enum ints
+    String repeatDayKeyConverter(int weekday) {
+      switch (weekday) {
+        case DateTime.monday:
+          return "mon";
+        case DateTime.tuesday:
+          return "tue";
+        case DateTime.wednesday:
+          return "wed";
+        case DateTime.thursday:
+          return "thur";
+        case DateTime.friday:
+          return "fri";
+        case DateTime.saturday:
+          return "sat";
+        case DateTime.sunday:
+          return "sun";
+        default:
+          throw "Invalid day";
+      }
+    }
+
+    ///Uses for unified date format
+    String getCWDDate(DateTime c) {
+      return DateFormat("yyyy-MM-dd").format(c);
+    }
+
+    //Duration of the single day event
+    String startTime = DateFormat.Hm().format(_eventsMap["start"]) + ":00",
+        endTime = DateFormat.Hm().format(_eventsMap["end"]) + ":00";
+    DateTime cwd = _eventsMap["start"];
+    List<String> attendees = getEmailListStr();
+    //It's keep insert until the end of the date
+    while (cwd.isBefore(_eventsMap["end"])) {
+      //When cwd's weekday is assign to repeated
+      if (_selectedDay[repeatDayKeyConverter(cwd.weekday)]) {
+        Event sDE = new Event();
+        EventDateTime timeStart = new EventDateTime();
+        EventDateTime timeEnd = new EventDateTime();
+        timeStart.dateTime = DateTime.parse(getCWDDate(cwd) + " " + startTime);
+        timeStart.timeZone = timezone;
+        timeEnd.dateTime = DateTime.parse(getCWDDate(cwd) + " " + endTime);
+        timeEnd.timeZone = timezone;
+        sDE.start = timeStart;
+        sDE.end = timeEnd;
+        sDE.summary = _controllers["summary"].text;
+        if (attendees[0] != "") {
+          //It still gives a empty string if nothing can be split
+          attendees.forEach((emailAddr) {
+            EventAttendee ea = EventAttendee();
+            ea.email = emailAddr;
+            sDE.attendees.add(ea);
+          });
+        }
+        try {
+          capi.events.insert(sDE, GCalAPIHandler.calId).then((value) {
+            if (value.status == "confirmed") {
+              print("Event added");
+            }
+          });
+        } catch (insert_failed) {
+          print(insert_failed);
+        }
+        //if (!await assignSingleEvent(capi, sDE)) {
+        //  return false;
+        //}
+      }
+      cwd = cwd.add(Duration(days: 1));
+    }
   }
 
   @override
@@ -153,37 +302,32 @@ class _OTPCalenderEventAdder extends State<OTPCalenderEventAdder> {
                             ],
                           ));
                 } else {
-                  List<String> getEmailListStr() {
-                    return _controllers["attendees"].text.split(',');
-                  }
-
-                  InsertEvent(
-                          from: _eventsMap["start"],
-                          to: _eventsMap["end"],
-                          summary: _controllers["summary"].text,
-                          repeatDay: _selectedDay,
-                          attendees: getEmailListStr())
-                      .run()
-                      .then((isSuccess) {
-                    if (!isSuccess) {
-                      throw "Unable inserting event to Google API";
-                    }
-                  }).then((_) {
-                    Navigator.pop(context);
-                  }).onError((_, __) {
+                  //Insert event handler
+                  _CApiManager.grant.then((capi) {
+                    insertEvent(capi);
                     showDialog(
                         context: context,
                         builder: (context) => AlertDialog(
-                              title: Text("Failed to insert events"),
+                              title: Text("The new event has been created"),
                               actions: [
                                 TextButton(
                                     onPressed: () {
                                       Navigator.pop(context);
                                     },
-                                    child: Text("OK")),
+                                    child: Text("OK"))
                               ],
-                            ));
+                            )).then((_) {
+                      Navigator.pop(context);
+                    });
                   });
+
+                  /*InsertEvent(
+                          from: _eventsMap["start"],
+                          to: _eventsMap["end"],
+                          summary: _controllers["summary"].text,
+                          repeatDay: _selectedDay,
+                          attendees: getEmailListStr())*/
+
                 }
               },
               child: Text(
