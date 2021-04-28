@@ -73,11 +73,15 @@ Column _writtenTest(BuildContext context) {
       //End symbol questions
       Padding(padding: EdgeInsets.all(10)),
       //Combine questions
-      _elButton(FontAwesomeIcons.chartBar, "Combine Questions", () {}),
+      _elButton(FontAwesomeIcons.chartBar, "Combine Questions", () {
+        QuestionPageHandler.start(context, 2, false);
+      }),
       //End combine questions
       Padding(padding: EdgeInsets.all(10)),
       //Mock written test
-      _elButton(FontAwesomeIcons.pencilRuler, "Mock Written Test", () {})
+      _elButton(FontAwesomeIcons.pencilRuler, "Mock Written Test", () {
+        QuestionPageHandler.start(context, 2, true);
+      })
       //End mock written test
     ],
   );

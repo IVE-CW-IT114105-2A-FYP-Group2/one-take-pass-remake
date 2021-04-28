@@ -20,15 +20,22 @@ class QuestionPageHandler {
     List<Question> _qOs = [];
     switch (mode) {
       case 0:
+        //Text only
         _qR.forEach((q) {
           _qOs.add(TextQuestion.fromJSON(q));
         });
         break;
       case 1:
+        //Symbol only
         _qR.forEach((q) {
           _qOs.add(SymbolQuestion.fromJSON(q));
         });
         break;
+      case 2:
+        //Combine & mock
+        _qR.forEach((q) {
+          _qOs.add(Question.autoParseFromJSON(q));
+        });
     }
     return _qOs;
   }
@@ -126,7 +133,7 @@ abstract class _QuestionPage extends State<QuestionPage> {
                     correctCount.toString() +
                     " question" +
                     ((correctCount == 1) ? " is" : "s are") +
-                    "correct",
+                    " correct",
                 style: TextStyle(fontSize: 18)),
             Container(
                 width: MediaQuery.of(context).size.width,
