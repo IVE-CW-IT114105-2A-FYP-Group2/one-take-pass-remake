@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 import 'package:one_take_pass_remake/themes.dart';
 
+@Deprecated('This should be integrated when needed')
 class LinkGoogleNotify extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
