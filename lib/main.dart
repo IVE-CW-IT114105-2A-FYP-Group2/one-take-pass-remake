@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart' show DefaultCupertinoLocalizations;
 import 'package:flutter/material.dart';
 import 'package:one_take_pass_remake/pages/index.dart';
-import 'package:one_take_pass_remake/pages/login.dart';
 import 'package:one_take_pass_remake/themes.dart';
 
 ///Rebuild version of one take pass for fitting chatting functions
