@@ -1,4 +1,4 @@
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/cupertino.dart' show DefaultCupertinoLocalizations;
 import 'package:flutter/material.dart';
 import 'package:one_take_pass_remake/pages/index.dart';
 import 'package:one_take_pass_remake/pages/login.dart';

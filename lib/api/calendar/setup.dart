@@ -31,25 +31,16 @@ class CalendarInit {
 }
 
 ///Google calendar API handler
-abstract class GCalAPIHandler {
+class GCalAPIHandler {
   static final String calId = "primary";
-  Future<dynamic> run() async {
+  Future<CalendarApi> getGranted() async {
     try {
-      return await clientViaUserConsent(
-              CalendarInit.instance, CalendarInit.scope, prompt)
-          .then((AuthClient client) async {
-        var calendar = CalendarApi(client);
-        return await task(calendar);
-      });
-    } catch (gapie) {
-      return false;
+      return new CalendarApi(await clientViaUserConsent(
+          CalendarInit.instance, CalendarInit.scope, prompt));
+    } catch (gapierr) {
+      return null;
     }
   }
-
-  ///What task will do in subclasses
-  ///
-  ///You MUST call [run] which will initalize Google API at the same time
-  Future<dynamic> task(CalendarApi capi);
 
   ///Assign auth by [gauthurl]
   void prompt(String gauthurl) async {
