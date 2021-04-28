@@ -118,6 +118,7 @@ class _OTPCalender extends State<OTPCalender> {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(
               child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text("Getting your calendar..."),
                   CircularProgressIndicator()
@@ -126,11 +127,12 @@ class _OTPCalender extends State<OTPCalender> {
             );
           } else {
             if (snapshot.hasData) {
-              print(snapshot.data);
+              //print(snapshot.data);
               return calendarInterface(context, snapshot.data);
             } else {
               return Center(
                 child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text("Unable to get your calendar"),
                     Icon(
