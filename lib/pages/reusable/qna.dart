@@ -328,7 +328,7 @@ class _IncorrectAns extends _ReviewAnswer {
   _IncorrectAns({@required this.actual}) : super();
 
   @override
-  Color bgColour() => colourPicker(200, 12, 12);
+  Color bgColour() => colourPicker(200, 120, 120);
 
   @override
   String response() => "Incorrect!\nThe correct answer is:\n" + actual;
