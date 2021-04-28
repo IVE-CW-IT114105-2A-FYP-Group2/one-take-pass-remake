@@ -1,7 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.one_take_pass_remake">
+   <uses-permission android:name="android.permission.INTERNET"/>
    <application
-        android:label="one_take_pass_remake"
+        android:label="One Take Pass"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"
