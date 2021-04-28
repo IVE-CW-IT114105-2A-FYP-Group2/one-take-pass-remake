@@ -84,7 +84,7 @@ class OTPLogin extends StatelessWidget {
               return false;
             }
             //Should be more handler
-            return true;
+            return signUpResp.data["msg"] == "Signup successfully";
           }
 
           //Function behaviours
