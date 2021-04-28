@@ -35,8 +35,10 @@ extension PersonalityGetter on Personality {
 
   ///Receive enum object
   static Personality getEnumObj(String str) {
+    print(Personality.funny.toString());
     return Personality.values.firstWhere((p) =>
-        p.toString().toLowerCase() == str.replaceAll("-", "_").toLowerCase());
+        p.toString().toLowerCase() ==
+        ("personality." + str.replaceAll("-", "_")).toLowerCase());
   }
 }
 

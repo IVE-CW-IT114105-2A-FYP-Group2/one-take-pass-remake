@@ -37,9 +37,9 @@ class Instructor extends OTPUsers {
     return Instructor(
         json["name"],
         json["description"],
-        PersonalityGetter.getEnumObj(json["instructorStyle"]),
+        PersonalityGetter.getEnumObj(json["instructionStyle"]),
         HKDistrictGetter.getEnumObj(json["location"]),
-        json["vehicleType"]);
+        json["vechicleType"]);
   }
 
   static List<Instructor> get dummyInstructor {

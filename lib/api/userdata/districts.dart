@@ -100,7 +100,9 @@ extension HKDistrictGetter on HKDistrict {
   }
 
   static HKDistrict getEnumObj(String str) {
-    return HKDistrict.values
-        .firstWhere((e) => e.toString().toLowerCase() == str.toLowerCase());
+    return HKDistrict.values.firstWhere(
+        (e) =>
+            e.toString().toLowerCase() == ("HKDistrict." + str).toLowerCase(),
+        orElse: () => HKDistrict.caw);
   }
 }

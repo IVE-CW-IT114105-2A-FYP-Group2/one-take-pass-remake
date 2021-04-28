@@ -1,6 +1,8 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
-import 'package:one_take_pass_remake/api/userdata/behaviours.dart';
+import 'package:one_take_pass_remake/api/misc.dart';
+import 'package:one_take_pass_remake/api/url/localapiurl.dart';
 import 'package:one_take_pass_remake/pages/reusable/instructor_info.dart';
 import 'package:one_take_pass_remake/themes.dart';
 import 'package:one_take_pass_remake/api/userdata/users.dart';
@@ -65,7 +67,8 @@ class _FindDriverUI extends State<_FindDriver> {
                   style: TextStyle(color: Colors.white, fontSize: 16),
                 ),
                 onPressed: () {
-                  _keyword = _controller.text;
+                  _keyword = _controller.text ?? "";
+                  _keyword.replaceAll(RegexLibraries.whiteSpaceOnStart, "");
                   setState(() {}); //Trigger new build with keyword
                 },
                 color: OTPColour.light1,
@@ -88,17 +91,24 @@ class _SearchList extends StatelessWidget {
   final String keyword;
   _SearchList({@required this.keyword});
 
-  Future<String> getKWDelay() {
-    return Future.delayed(Duration(seconds: 5), () {
-      return this.keyword;
+  Future<List<Instructor>> fetchSearch(String keyword) async {
+    var dio = Dio();
+    dio.options.headers["Content-Type"] = "application/json";
+    var resp =
+        await dio.post(APISitemap.findInstructor.toString(), data: {"key": ""});
+    //Get result data
+    print(resp.data);
+    List<Instructor> placeholder = [];
+    resp.data.forEach((ijson) {
+      placeholder.add(Instructor.fromJSON(ijson));
     });
+    return placeholder;
   }
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-        future: Future<List<Instructor>>.delayed(Duration(seconds: 1))
-            .then((_) => Instructor.dummyInstructor),
+        future: fetchSearch(keyword),
         builder: (context, snapshot) {
           if (snapshot.connectionState != ConnectionState.done) {
             //When fetching data
@@ -134,9 +144,17 @@ class _SearchList extends StatelessWidget {
             //Error
             return Center(
               child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Icon(CupertinoIcons.xmark_circle),
-                  Text("Connection error")
+                  Icon(
+                    CupertinoIcons.xmark_circle,
+                    size: 120,
+                  ),
+                  Text(
+                    "No user found",
+                    style: TextStyle(fontSize: 24),
+                  )
                 ],
               ),
             );

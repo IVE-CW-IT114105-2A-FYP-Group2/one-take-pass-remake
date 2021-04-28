@@ -21,6 +21,10 @@ class APISitemap {
     return Uri.https(_apiUrl, 'question/result');
   }
 
+  static Uri get findInstructor {
+    return Uri.https(_apiUrl, 'search/user/teacher');
+  }
+
   static Uri getAns(int mode) {
     switch (mode) {
       case 0:
