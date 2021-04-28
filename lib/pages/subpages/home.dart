@@ -97,7 +97,7 @@ class _SearchList extends StatelessWidget {
     var resp =
         await dio.post(APISitemap.findInstructor.toString(), data: {"key": ""});
     //Get result data
-    print(resp.data);
+    //print(resp.data);
     List<Instructor> placeholder = [];
     resp.data.forEach((ijson) {
       placeholder.add(Instructor.fromJSON(ijson));
