@@ -1,10 +1,15 @@
 import 'dart:collection';
 
 import 'package:dio/dio.dart';
+import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 import 'package:one_take_pass_remake/api/elearning/questions.dart';
 import 'package:one_take_pass_remake/api/url/localapiurl.dart';
+import 'package:one_take_pass_remake/api/userdata/login_request.dart'
+    show UserTokenLocalStorage;
 import 'package:one_take_pass_remake/themes.dart';
+
+final Color _adjustedRed = colourPicker(200, 120, 120);
 
 ///Question handler between API and App
 ///
@@ -105,53 +110,7 @@ abstract class _QuestionPage extends State<QuestionPage> {
   void onWrong(String actualAnswer);
 
   ///Display data on this test when all question is asked
-  Widget _allDonePage() {
-    _isTesting = false;
-    return Container(
-        margin: EdgeInsets.all(10),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Container(
-                width: MediaQuery.of(context).size.width,
-                child: Text(
-                  "You asked",
-                  style: TextStyle(fontSize: 36),
-                )),
-            Container(
-                width: MediaQuery.of(context).size.width,
-                child: Text(
-                  totalQuestion.toString() + " questions",
-                  textAlign: TextAlign.right,
-                  style: TextStyle(fontSize: 28),
-                )),
-            Divider(),
-            Text(
-                "and answered " +
-                    correctCount.toString() +
-                    " question" +
-                    ((correctCount == 1) ? " is" : "s are") +
-                    " correct",
-                style: TextStyle(fontSize: 18)),
-            Container(
-                width: MediaQuery.of(context).size.width,
-                margin: EdgeInsets.all(30),
-                child: MaterialButton(
-                  color: OTPColour.dark2,
-                  padding: EdgeInsets.all(7),
-                  child: Text(
-                    "Exit",
-                    style: TextStyle(color: Colors.white, fontSize: 24),
-                  ),
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                ))
-          ],
-        ));
-  }
+  Widget allDonePage();
 
   ///Ask question
   Widget _showQuestion(Question q) {
@@ -179,7 +138,7 @@ abstract class _QuestionPage extends State<QuestionPage> {
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-        child: _getScaffold((_q == null) ? _allDonePage() : _showQuestion(_q)),
+        child: _getScaffold((_q == null) ? allDonePage() : _showQuestion(_q)),
         onWillPop: () async {
           if (!_isTesting) {
             return true;
@@ -239,6 +198,55 @@ class _PractiseQuestion extends _QuestionPage {
       _ansReviewedListener(isExit as bool);
     });
   }
+
+  @override
+  Widget allDonePage() {
+    _QuestionPage._isTesting = false;
+    return Container(
+        margin: EdgeInsets.all(10),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Container(
+                width: MediaQuery.of(context).size.width,
+                child: Text(
+                  "You asked",
+                  style: TextStyle(fontSize: 36),
+                )),
+            Container(
+                width: MediaQuery.of(context).size.width,
+                child: Text(
+                  totalQuestion.toString() + " questions",
+                  textAlign: TextAlign.right,
+                  style: TextStyle(fontSize: 28),
+                )),
+            Divider(),
+            Text(
+                "and answered " +
+                    correctCount.toString() +
+                    " question" +
+                    ((correctCount == 1) ? " is" : "s are") +
+                    " correct",
+                style: TextStyle(fontSize: 18)),
+            Container(
+                width: MediaQuery.of(context).size.width,
+                margin: EdgeInsets.all(30),
+                child: MaterialButton(
+                  color: OTPColour.dark2,
+                  padding: EdgeInsets.all(7),
+                  child: Text(
+                    "Exit",
+                    style: TextStyle(color: Colors.white, fontSize: 24),
+                  ),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                ))
+          ],
+        ));
+  }
 }
 
 ///A page that disabled reviewing answer and look like a exam
@@ -252,6 +260,121 @@ class _MockExamQuestion extends _QuestionPage {
   @override
   void onWrong(String _) {
     _nextQuestion();
+  }
+
+  @override
+  Widget allDonePage() {
+    Widget displayResult(bool hasFailed) {
+      return Center(
+          child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Container(
+            alignment: Alignment.center,
+            height: 250,
+            margin: EdgeInsets.all(25),
+            child: Text(
+              "You " + (hasFailed ? "failed" : "passed") + " this mock exam",
+              style: TextStyle(fontSize: 36, fontWeight: FontWeight.w300),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          Container(
+              alignment: Alignment.center,
+              height: 150,
+              margin: EdgeInsets.all(30),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    "Your result is:",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w300),
+                    textAlign: TextAlign.center,
+                  ),
+                  Text(
+                    correctCount.toString() + " / " + totalQuestion.toString(),
+                    style: TextStyle(fontSize: 48),
+                    textAlign: TextAlign.center,
+                  )
+                ],
+              )),
+          Expanded(
+            child: Container(
+              alignment: Alignment.center,
+              width: MediaQuery.of(context).size.width,
+              margin: EdgeInsets.all(20),
+              child: MaterialButton(
+                child: Text("Exit",
+                    style: TextStyle(fontSize: 24, color: Colors.white)),
+                padding: EdgeInsets.all(15),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                color: OTPColour.dark2,
+              ),
+            ),
+          )
+        ],
+      ));
+    }
+
+    Widget passedExam() {
+      //changeBgColour = OTPColour.light1;
+      return displayResult(false);
+    }
+
+    Widget failedExam() {
+      //changeBgColour = _adjustedRed;
+      return displayResult(true);
+    }
+
+    return FutureBuilder<bool>(future: (() async {
+      String tokenId = await UserTokenLocalStorage.getToken();
+      //Submit answer first
+      var dio = Dio();
+      dio.options.headers["Content-Type"] = "application/json";
+      var submit = await dio.post(APISitemap.submitMockMark.toString(),
+          data: {"refresh_token": tokenId, "mark": correctCount.toString()});
+      return submit.data["user_pass"] as bool;
+    })(), builder: (context, isPassed) {
+      if (isPassed.connectionState == ConnectionState.waiting) {
+        return Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text("Submitting your mark...", style: TextStyle(fontSize: 24)),
+              Padding(
+                  padding: EdgeInsets.all(30),
+                  child: CircularProgressIndicator())
+            ],
+          ),
+        );
+      } else {
+        if (isPassed.hasData) {
+          return (isPassed.data ? passedExam() : failedExam());
+        } else if (isPassed.hasError) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(
+                    "Oops... your mark is not submitted to server due to errors",
+                    style: TextStyle(fontSize: 24)),
+                Icon(
+                  CupertinoIcons.xmark_circle,
+                  size: 120,
+                )
+              ],
+            ),
+          );
+        }
+        return Container();
+      }
+    });
   }
 }
 
@@ -328,7 +451,7 @@ class _IncorrectAns extends _ReviewAnswer {
   _IncorrectAns({@required this.actual}) : super();
 
   @override
-  Color bgColour() => colourPicker(200, 120, 120);
+  Color bgColour() => _adjustedRed;
 
   @override
   String response() => "Incorrect!\nThe correct answer is:\n" + actual;

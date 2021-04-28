@@ -17,6 +17,10 @@ class APISitemap {
     return Uri.https(_apiUrl, 'getinfo');
   }
 
+  static Uri get submitMockMark {
+    return Uri.https(_apiUrl, 'question/result');
+  }
+
   static Uri getAns(int mode) {
     switch (mode) {
       case 0:
