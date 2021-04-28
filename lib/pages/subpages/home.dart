@@ -94,8 +94,8 @@ class _SearchList extends StatelessWidget {
   Future<List<Instructor>> fetchSearch(String keyword) async {
     var dio = Dio();
     dio.options.headers["Content-Type"] = "application/json";
-    var resp =
-        await dio.post(APISitemap.findInstructor.toString(), data: {"key": ""});
+    var resp = await dio
+        .post(APISitemap.findInstructor.toString(), data: {"key": keyword});
     //Get result data
     //print(resp.data);
     List<Instructor> placeholder = [];
