@@ -131,6 +131,7 @@ class UserIdentify extends StatelessWidget {
       requireLogin(ModalRoute.of(context), context);
     }
 
+    //Defer time that back to login page
     Timer(Duration(seconds: _firstTime ? 0 : 5), _toLogin);
 
     return Scaffold(body: Center(child: Text("No existed login record!")));

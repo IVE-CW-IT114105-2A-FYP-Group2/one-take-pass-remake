@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+//import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:one_take_pass_remake/api/userdata/behaviours.dart';
 import 'package:one_take_pass_remake/api/userdata/districts.dart';
 import 'package:one_take_pass_remake/api/userdata/gender.dart';
@@ -62,7 +62,8 @@ class Instructor extends OTPUsers {
   }
 }
 
-class InstructorRating extends StatelessWidget {
+//Please uncomment flutter_rating_bar in pubspec.yaml first
+/*class InstructorRating extends StatelessWidget {
   final BuildContext context;
   final double rate;
 
@@ -81,4 +82,4 @@ class InstructorRating extends StatelessWidget {
       unratedColor: OTPColour.dark2,
     );
   }
-}
+}*/
