@@ -25,6 +25,10 @@ class APISitemap {
     return Uri.https(_apiUrl, 'search/user/teacher');
   }
 
+  static Uri get recentMockMark {
+    return Uri.https(_apiUrl, 'question/getAllResult');
+  }
+
   static Uri getAns(int mode) {
     switch (mode) {
       case 0:

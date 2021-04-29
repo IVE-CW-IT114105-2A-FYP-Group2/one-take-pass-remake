@@ -119,10 +119,13 @@ abstract class _QuestionPage extends State<QuestionPage> {
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Text(
-          "Question " + _questionNo.toString(),
-          style: TextStyle(fontSize: 36, fontWeight: FontWeight.w300),
-        ),
+        Expanded(
+            child: Container(
+                alignment: Alignment.center,
+                child: Text(
+                  "Question " + _questionNo.toString(),
+                  style: TextStyle(fontSize: 36, fontWeight: FontWeight.w300),
+                ))),
         q.interface(onCorrect, onWrong)
       ],
     );

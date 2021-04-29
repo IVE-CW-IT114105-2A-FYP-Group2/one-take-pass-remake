@@ -53,6 +53,7 @@ class TextQuestion extends Question {
   @override
   Widget interface(Function onCorrect, Function onWrong) {
     return Container(
+      margin: EdgeInsets.only(left: 10, right: 10),
       child: Column(children: [
         Text(
           question,

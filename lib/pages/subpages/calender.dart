@@ -9,6 +9,7 @@ import 'package:googleapis/calendar/v3.dart';
 import 'package:intl/intl.dart' show DateFormat;
 import 'package:one_take_pass_remake/api/calendar/setup.dart';
 import 'package:one_take_pass_remake/api/misc.dart' show RegexLibraries;
+import 'package:one_take_pass_remake/main.dart' show routeObserver;
 import 'package:one_take_pass_remake/themes.dart';
 import 'package:table_calendar/table_calendar.dart';
 
@@ -30,7 +31,7 @@ class OTPCalender extends StatefulWidget {
   State<StatefulWidget> createState() => _OTPCalender();
 }
 
-class _OTPCalender extends State<OTPCalender> {
+class _OTPCalender extends State<OTPCalender> with RouteAware {
   //Store selected date (and today's date as default)
   DateTime _selectedDate = DateTime.now(), _focusedDate = DateTime.now();
 
@@ -40,6 +41,23 @@ class _OTPCalender extends State<OTPCalender> {
   @override
   void initState() {
     super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    routeObserver.subscribe(this, ModalRoute.of(context));
+  }
+
+  @override
+  void dispose() {
+    routeObserver.unsubscribe(this);
+    super.dispose();
+  }
+
+  @override
+  void didPopNext() {
+    setState(() {});
   }
 
   ///All interface about calendar
@@ -73,9 +91,7 @@ class _OTPCalender extends State<OTPCalender> {
                 },
                 calendarFormat: _format,
                 onPageChanged: (focused) {
-                  setInnerState(() {
-                    _focusedDate = focused;
-                  });
+                  _focusedDate = focused;
                 },
                 onFormatChanged: (format) {
                   setInnerState(() {
