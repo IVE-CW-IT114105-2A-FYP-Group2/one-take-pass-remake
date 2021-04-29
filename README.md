@@ -1,6 +1,8 @@
 # one_take_pass_remake
 
-I can't build inbox function since i can't find the best solution
+~~I can't build inbox function since i can't find the best solution~~
+
+Just build a dummy web socket chat...
 
 ## Getting Started
 
