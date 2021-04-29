@@ -11,4 +11,18 @@ extension GenderHandler on Genders {
         return "Others";
     }
   }
+
+  ///Return back to string
+  Genders getEnumByString(String str) {
+    switch (str) {
+      case "M":
+      case "Male":
+        return Genders.male;
+      case "F":
+      case "Female":
+        return Genders.female;
+      default:
+        return Genders.others;
+    }
+  }
 }

@@ -1,5 +1,8 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
+import 'package:one_take_pass_remake/api/url/localapiurl.dart';
+import 'package:one_take_pass_remake/api/userdata/gender.dart';
 import 'package:one_take_pass_remake/api/userdata/login_request.dart';
 import 'package:one_take_pass_remake/pages/index.dart' show UserIdentify;
 import 'package:one_take_pass_remake/pages/login.dart';
@@ -137,18 +140,29 @@ class _OTPAbout extends State<OTPAbout> {
 }*/
 
 class EditProfile extends StatefulWidget {
+  bool _canEdit = false;
+
+  ///To signal that can be editable
+  void setEditable() {
+    _canEdit = true;
+  }
+
   @override
   State<StatefulWidget> createState() => _EditProfile();
 }
 
 class _EditProfile extends State<EditProfile> {
   TextEditingController _nameController;
-  Map<String, bool> _genderRadio = {"M": false, "F": false};
+  Map<String, TextEditingController> _npwdInputCtrl;
 
   @override
   void initState() {
     super.initState();
     _nameController = TextEditingController();
+    _npwdInputCtrl = {
+      "password": TextEditingController(),
+      "confirm": TextEditingController()
+    };
   }
 
   Widget optionUI(UserREST receivedInfo) {
@@ -157,32 +171,35 @@ class _EditProfile extends State<EditProfile> {
       child: ListView(
         children: [
           TextField(
+            controller: _nameController,
             decoration: InputDecoration(labelText: "Name"),
+            maxLines: 1,
+            maxLength: 255,
+            enableSuggestions: false,
+            autocorrect: false,
           ),
           Divider(),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                "Gender",
-                style: TextStyle(fontSize: 24),
-              ),
-              RadioListTile(
-                value: true,
-                groupValue: "gender",
-                onChanged: (_) {},
-                title: Text("Male"),
-                selected: true,
-              ),
-              RadioListTile(
-                value: false,
-                groupValue: "gender",
-                onChanged: (_) {},
-                title: Text("Feale"),
-              )
-            ],
+          Text(
+            "Change Password",
+            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w300),
           ),
-          Divider(),
+          TextField(
+            controller: _npwdInputCtrl["password"],
+            decoration: InputDecoration(labelText: "New password"),
+            maxLines: 1,
+            obscureText: true,
+            enableSuggestions: false,
+            autocorrect: false,
+          ),
+          Padding(padding: EdgeInsets.only(top: 10, bottom: 10)),
+          TextField(
+            controller: _npwdInputCtrl["confirm"],
+            decoration: InputDecoration(labelText: "Confirm new password"),
+            maxLines: 1,
+            obscureText: true,
+            enableSuggestions: false,
+            autocorrect: false,
+          )
         ],
       ),
     );
@@ -192,10 +209,71 @@ class _EditProfile extends State<EditProfile> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
+          title: Text("Edit profile"),
+          centerTitle: true,
           actions: [
             TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
+                onPressed: () async {
+                  Map<String, dynamic> getInputData() {
+                    bool errByMismatchedPwd = false;
+                    try {
+                      errByMismatchedPwd = (_npwdInputCtrl["password"].text !=
+                          _npwdInputCtrl["confirm"].text);
+                      if (errByMismatchedPwd) {
+                        throw "Stop process with mismatched password";
+                      }
+                      return {
+                        "refresh_token": "",
+                        "name": _nameController.text,
+                        "password": _npwdInputCtrl["password"].text
+                      };
+                    } catch (err) {
+                      showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                                title: Text(errByMismatchedPwd
+                                    ? "Password and confirm password mismatched"
+                                    : "Failed to get your edited data"),
+                                content: Text(errByMismatchedPwd
+                                    ? "Please ensure your new password and confirm password should be the same"
+                                    : "Your data is not loaded yet, please try again later."),
+                                actions: [
+                                  TextButton(
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      },
+                                      child: Text("OK"))
+                                ],
+                              ));
+                    }
+                  }
+
+                  try {
+                    String token = await UserTokenLocalStorage.getToken();
+                    Map<String, dynamic> _editedForm = getInputData();
+                    _editedForm["refresh_token"] = token;
+                    var dio = Dio();
+                    dio.options.headers['Content-Type'] = "application/json";
+                    var resp = await dio.post(APISitemap.updateInfo.toString(),
+                        data: _editedForm);
+                    if (resp.data["msg"] != "Update record successfully") {
+                      throw "Update failed";
+                    }
+                  } catch (err) {
+                    showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                              title: Text("Update failed"),
+                              content: Text("Try again later."),
+                              actions: [
+                                TextButton(
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    },
+                                    child: Text("OK"))
+                              ],
+                            ));
+                  }
                 },
                 child: Text(
                   "Save",
@@ -210,8 +288,9 @@ class _EditProfile extends State<EditProfile> {
           })(),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
+              _nameController.text = snapshot.data.fullName;
               return optionUI(snapshot.data);
-            } else {
+            } else if (snapshot.hasError) {
               return Center(
                 child: Column(
                   children: [
@@ -223,6 +302,8 @@ class _EditProfile extends State<EditProfile> {
                   ],
                 ),
               );
+            } else {
+              return Container();
             }
           },
         ));

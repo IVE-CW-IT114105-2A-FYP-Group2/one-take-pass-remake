@@ -29,6 +29,10 @@ class APISitemap {
     return Uri.https(_apiUrl, 'question/getAllResult');
   }
 
+  static Uri get updateInfo {
+    return Uri.https(_apiUrl, 'updateInfo');
+  }
+
   static Uri getAns(int mode) {
     switch (mode) {
       case 0:
