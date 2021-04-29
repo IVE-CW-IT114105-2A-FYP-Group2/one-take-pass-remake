@@ -29,8 +29,6 @@ extension PersonalityGetter on Personality {
       default:
         throw "This personality is undefined!";
     }
-    //Unneccessary
-    return "";
   }
 
   ///Receive enum object
@@ -58,7 +56,6 @@ extension SpeakingLanguageGetter on SpeakingLanguage {
       default:
         throw "Undefined language!";
     }
-    return "";
   }
 
   static SpeakingLanguage getEnumObj(String str) {

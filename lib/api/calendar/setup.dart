@@ -1,9 +1,7 @@
-import 'dart:convert';
 import 'dart:io';
 
 import "package:googleapis_auth/auth_io.dart";
 import 'package:googleapis/calendar/v3.dart';
-import 'package:one_take_pass_remake/api/misc.dart' show RegexLibraries;
 import 'package:url_launcher/url_launcher.dart';
 
 ///Initalize the google calendar apis

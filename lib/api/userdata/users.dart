@@ -1,9 +1,9 @@
-import 'package:flutter/material.dart';
+//import 'package:flutter/material.dart';
 //import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:one_take_pass_remake/api/userdata/behaviours.dart';
 import 'package:one_take_pass_remake/api/userdata/districts.dart';
-import 'package:one_take_pass_remake/api/userdata/gender.dart';
-import 'package:one_take_pass_remake/themes.dart';
+//import 'package:one_take_pass_remake/api/userdata/gender.dart';
+//import 'package:one_take_pass_remake/themes.dart';
 
 //Integrated those object that required
 export 'package:one_take_pass_remake/api/userdata/behaviours.dart';

@@ -36,6 +36,7 @@ class APISitemap {
       case 1:
         return Uri.https(_apiUrl, 'question/get/symbol');
       case 2:
+      default:
         return Uri.https(_apiUrl, 'question/get/mock');
     }
   }

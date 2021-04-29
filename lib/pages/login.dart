@@ -37,6 +37,7 @@ class OTPLogin extends StatelessWidget {
         onLogin: _authUser,
         onSignup: (lD) async {
           //Variable
+          // ignore: avoid_init_to_null
           String errMsg = null;
           //int stage = 0;
           int gender = -1; //0 = male, 1 = female

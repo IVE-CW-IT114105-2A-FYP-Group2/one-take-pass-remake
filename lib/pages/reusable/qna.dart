@@ -440,6 +440,7 @@ abstract class _ReviewAnswer extends StatelessWidget {
   }
 }
 
+// ignore: must_be_immutable
 class _CorrectAns extends _ReviewAnswer {
   @override
   Color bgColour() => OTPColour.light2;
@@ -448,6 +449,7 @@ class _CorrectAns extends _ReviewAnswer {
   String response() => "Correct!";
 }
 
+// ignore: must_be_immutable
 class _IncorrectAns extends _ReviewAnswer {
   ///Actual answer
   final String actual;
