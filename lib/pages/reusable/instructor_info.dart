@@ -1,13 +1,38 @@
 import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 import 'package:one_take_pass_remake/api/userdata/users.dart';
+import 'package:one_take_pass_remake/pages/reusable/chatting.dart';
+import 'package:one_take_pass_remake/pages/subpages/inbox.dart'
+    show contactKeyName;
 import 'package:one_take_pass_remake/themes.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 ///A page about instructor
 class InstructorInfo extends StatelessWidget {
   final Instructor instructor;
 
   InstructorInfo({@required this.instructor});
+
+  ///Append toinbox list when clicked
+  Future<void> _addToListInInbox(String name) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String> existedChatUser;
+    try {
+      existedChatUser = prefs.getStringList(contactKeyName);
+      if (existedChatUser == null) {
+        throw "Need to be initalized";
+      }
+    } catch (read_fail) {
+      existedChatUser = [];
+    }
+    if (existedChatUser.isNotEmpty) {
+      if (existedChatUser.contains(name)) {
+        return;
+      }
+    }
+    existedChatUser.add(name);
+    await prefs.setStringList(contactKeyName, existedChatUser);
+  }
 
   ///Heading definitions
   Widget _heading(BuildContext context) {
@@ -90,10 +115,25 @@ class InstructorInfo extends StatelessWidget {
           _details(),
           Divider(color: colourPicker(128, 128, 128, 120)),
           Center(
-            child: MaterialButton(
-              color: OTPColour.light1,
-              onPressed: () {},
-              child: Text("Open chat"),
+            child: Container(
+              width: MediaQuery.of(context).size.width / 1.25,
+              height: 50,
+              child: MaterialButton(
+                color: OTPColour.light1,
+                onPressed: () async {
+                  await _addToListInInbox(instructor.name);
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              ChatComm(name: instructor.name)));
+                },
+                child: Text(
+                  "Open chat",
+                  style: TextStyle(fontSize: 18),
+                  textAlign: TextAlign.center,
+                ),
+              ),
             ),
           )
         ],
