@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
@@ -216,47 +218,42 @@ class _EditProfile extends State<EditProfile> {
                 onPressed: () async {
                   Map<String, dynamic> getInputData() {
                     bool errByMismatchedPwd = false;
-                    try {
+                    final reqBody = {
+                      "refresh_token": "",
+                    };
+                    if (_npwdInputCtrl["password"].text.isNotEmpty ||
+                        _npwdInputCtrl["confirm"].text.isNotEmpty) {
                       errByMismatchedPwd = (_npwdInputCtrl["password"].text !=
                           _npwdInputCtrl["confirm"].text);
                       if (errByMismatchedPwd) {
                         throw "Stop process with mismatched password";
+                      } else {
+                        reqBody["password"] = _npwdInputCtrl["password"].text;
                       }
-                      return {
-                        "refresh_token": "",
-                        "name": _nameController.text,
-                        "password": _npwdInputCtrl["password"].text
-                      };
-                    } catch (err) {
-                      showDialog(
-                          context: context,
-                          builder: (context) => AlertDialog(
-                                title: Text(errByMismatchedPwd
-                                    ? "Password and confirm password mismatched"
-                                    : "Failed to get your edited data"),
-                                content: Text(errByMismatchedPwd
-                                    ? "Please ensure your new password and confirm password should be the same"
-                                    : "Your data is not loaded yet, please try again later."),
-                                actions: [
-                                  TextButton(
-                                      onPressed: () {
-                                        Navigator.pop(context);
-                                      },
-                                      child: Text("OK"))
-                                ],
-                              ));
                     }
+                    if (_nameController.text.isNotEmpty) {
+                      reqBody["name"] = _nameController.text;
+                    }
+                    return reqBody;
                   }
 
+                  var actualresp = "";
                   try {
                     String token = await UserTokenLocalStorage.getToken();
-                    Map<String, dynamic> _editedForm = getInputData();
+                    final Map<String, dynamic> _editedForm = getInputData();
                     _editedForm["refresh_token"] = token;
                     var dio = Dio();
                     dio.options.headers['Content-Type'] = "application/json";
                     var resp = await dio.post(APISitemap.updateInfo.toString(),
-                        data: _editedForm);
+                        data: jsonEncode(_editedForm));
+
+                    actualresp = resp.data["msg"];
                     if (resp.data["msg"] != "Update record successfully") {
+                      await showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                                title: resp.data["msg"],
+                              ));
                       throw "Update failed";
                     }
                   } catch (err) {
@@ -264,7 +261,7 @@ class _EditProfile extends State<EditProfile> {
                         context: context,
                         builder: (context) => AlertDialog(
                               title: Text("Update failed"),
-                              content: Text("Try again later."),
+                              content: Text("Try again later.\n" + actualresp),
                               actions: [
                                 TextButton(
                                     onPressed: () {

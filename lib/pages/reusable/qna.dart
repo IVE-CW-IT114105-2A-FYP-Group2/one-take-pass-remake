@@ -123,7 +123,10 @@ abstract class _QuestionPage extends State<QuestionPage> {
             child: Container(
                 alignment: Alignment.center,
                 child: Text(
-                  "Question " + _questionNo.toString(),
+                  "Question " +
+                      _questionNo.toString() +
+                      " / " +
+                      widget.questions.length.toString(),
                   style: TextStyle(fontSize: 36, fontWeight: FontWeight.w300),
                 ))),
         q.interface(onCorrect, onWrong)
@@ -281,6 +284,22 @@ class _MockExamQuestion extends _QuestionPage {
               "You " + (hasFailed ? "failed" : "passed") + " this mock exam",
               style: TextStyle(fontSize: 36, fontWeight: FontWeight.w300),
               textAlign: TextAlign.center,
+            ),
+          ),
+          Container(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(
+                  "Result:",
+                  style: TextStyle(fontSize: 16),
+                ),
+                Text(
+                  correctCount.toString() + " / " + totalQuestion.toString(),
+                  style: TextStyle(fontSize: 24),
+                )
+              ],
             ),
           ),
           Container(

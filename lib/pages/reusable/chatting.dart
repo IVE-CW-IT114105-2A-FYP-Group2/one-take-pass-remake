@@ -6,7 +6,7 @@ import 'package:one_take_pass_remake/themes.dart';
 import 'package:web_socket_channel/io.dart';
 
 class ChatComm extends StatefulWidget {
-  final wschat = IOWebSocketChannel.connect('ws://localhost:443');
+  //final wschat = IOWebSocketChannel.connect('ws://localhost:443');
   final String name;
   ChatComm({@required this.name});
   @override
@@ -44,12 +44,14 @@ class _ChatComm extends State<ChatComm> {
             }()),
             builder: (context, cu) {
               if (cu.hasData) {
-                Stack(
-                  children: [
-                    Container(
-                      width: MediaQuery.of(context).size.width,
-                      height: MediaQuery.of(context).size.height,
-                      child: StreamBuilder(
+                return StatefulBuilder(builder: (context, sentState) {
+                  return Stack(
+                    children: [
+                      Container(
+                          width: MediaQuery.of(context).size.width,
+                          height: MediaQuery.of(context).size.height,
+                          child:
+                              /*StreamBuilder(
                         stream: widget.wschat.stream,
                         builder: (context, msgobj) {
                           if (msgobj.hasData) {
@@ -73,54 +75,58 @@ class _ChatComm extends State<ChatComm> {
                               itemBuilder: (context, msgpos) =>
                                   _chatElements[msgpos]);
                         },
-                      ),
-                    ),
-                    Positioned(
-                      child: Container(
-                        width: MediaQuery.of(context).size.width,
-                        height: 48,
-                        child: Row(
-                          children: [
-                            Container(
-                              width: MediaQuery.of(context).size.width - 100,
-                              child: TextField(
-                                controller: _controller,
-                                decoration: InputDecoration(
-                                    border: OutlineInputBorder(),
-                                    labelText: "Message"),
+                      ),*/
+                              ListView.builder(
+                                  itemCount: _chatElements.length,
+                                  itemBuilder: (context, msgpos) =>
+                                      _chatElements[msgpos])),
+                      Positioned(
+                        child: Container(
+                          width: MediaQuery.of(context).size.width,
+                          height: 48,
+                          child: Row(
+                            children: [
+                              Container(
+                                width: MediaQuery.of(context).size.width - 100,
+                                child: TextField(
+                                  controller: _controller,
+                                  decoration: InputDecoration(
+                                      border: OutlineInputBorder(),
+                                      labelText: "Message"),
+                                ),
                               ),
-                            ),
-                            Container(
-                                height: 48,
-                                width: 100,
-                                child: StatefulBuilder(
-                                    builder: (context, sentState) {
-                                  return MaterialButton(
+                              Container(
+                                  height: 48,
+                                  width: 100,
+                                  child: MaterialButton(
                                       color: OTPColour.light2,
                                       child: Text("Send"),
                                       onPressed: () {
                                         if (_controller.text.isNotEmpty) {
-                                          widget.wschat.sink.add(jsonEncode({
+                                          /*widget.wschat.sink.add(jsonEncode({
                                             "msg": _controller.text,
                                             "from": cu.data,
                                             "to": widget.name
-                                          }));
+                                          }));*/
+                                          _chatElements.add(
+                                              _ChatElements._getMsgBox(
+                                                  _controller.text, true));
                                           sentState(() {
                                             _controller.clear();
                                           });
                                         }
-                                      });
-                                }))
-                          ],
+                                      }))
+                            ],
+                          ),
                         ),
-                      ),
-                      bottom: 0,
-                    )
-                  ],
-                );
+                        bottom: 0,
+                      )
+                    ],
+                  );
+                });
+              } else {
+                return Container();
               }
-
-              return Container();
             }));
   }
 }
