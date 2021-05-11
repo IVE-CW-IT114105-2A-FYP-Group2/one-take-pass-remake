@@ -21,7 +21,7 @@ class OTPLogin extends StatelessWidget {
       case "errors_server":
         return "There is an error from server, please try again later"; //When server malfunction
       case "student":
-      case "instructor":
+      case "privateDrivingInstructor":
         return null; //Use null for success according to API reference
       case "staff":
         await UserTokenLocalStorage.clearToken();
@@ -74,13 +74,14 @@ class OTPLogin extends StatelessWidget {
             //API caller
             var dio = Dio();
             dio.options.headers["Content-Type"] = "application/json";
-            var signUpResp = await dio.post(APISitemap.signup.toString(),
-                data: {
-                  "phoneno": phoneNo,
-                  "username": uname,
-                  "gender": genderInStr,
-                  "type": roleInStr
-                });
+            var signUpResp =
+                await dio.post(APISitemap.signup.toString(), data: {
+              "phoneno": phoneNo,
+              "password": pwd,
+              "username": uname,
+              "gender": genderInStr,
+              "type": roleInStr
+            });
             if (signUpResp.statusCode >= 400) {
               return false;
             }
@@ -180,7 +181,7 @@ class OTPLogin extends StatelessWidget {
             return errMsg;
           }
           // When user filled all
-          return await doSignUp(lD.name, lD.password, gender, role, uname)
+          return (await doSignUp(lD.name, lD.password, gender, role, uname))
               ? null
               : "There is an error when submitting to server";
         },

@@ -35,28 +35,28 @@ class _PageMap {
   }
 }
 
-final _PageMap _pmap = _PageMap(pageOpt: [
-  _PageOpt(
-      bnb: BottomNavigationBarItem(
-          icon: Icon(CupertinoIcons.home), label: "Home"),
-      opts: OTPHome()),
-  _PageOpt(
-      bnb: BottomNavigationBarItem(
-          icon: Icon(CupertinoIcons.calendar), label: "Calendar"),
-      opts: OTPCalender()),
-  _PageOpt(
-      bnb: BottomNavigationBarItem(
-          icon: Icon(CupertinoIcons.envelope), label: "Inbox"),
-      opts: OTPInbox()),
-  _PageOpt(
-      bnb: BottomNavigationBarItem(
-          icon: Icon(CupertinoIcons.book), label: "E-Learning"),
-      opts: OTPELearning()),
-  _PageOpt(
-      bnb: BottomNavigationBarItem(
-          icon: Icon(CupertinoIcons.person), label: "About"),
-      opts: OTPAbout())
-]);
+_PageMap _pmap(UserREST cur) => _PageMap(pageOpt: [
+      _PageOpt(
+          bnb: BottomNavigationBarItem(
+              icon: Icon(CupertinoIcons.home), label: "Home"),
+          opts: OTPHome(cur)),
+      _PageOpt(
+          bnb: BottomNavigationBarItem(
+              icon: Icon(CupertinoIcons.calendar), label: "Calendar"),
+          opts: OTPCalender()),
+      _PageOpt(
+          bnb: BottomNavigationBarItem(
+              icon: Icon(CupertinoIcons.envelope), label: "Inbox"),
+          opts: OTPInbox()),
+      _PageOpt(
+          bnb: BottomNavigationBarItem(
+              icon: Icon(CupertinoIcons.book), label: "E-Learning"),
+          opts: OTPELearning()),
+      _PageOpt(
+          bnb: BottomNavigationBarItem(
+              icon: Icon(CupertinoIcons.person), label: "About"),
+          opts: OTPAbout())
+    ]);
 
 class OTPIndex extends StatefulWidget {
   @override
@@ -72,9 +72,12 @@ class _OTPIndex extends State<OTPIndex> {
     });
   }
 
-  FloatingActionButton _actionBtnMap(BuildContext context) {
+  FloatingActionButton _actionBtnMap(BuildContext context, UserREST cur) {
     switch (_currentIdx) {
       case 1:
+        if (cur.roles == "student") {
+          return null;
+        }
         return FloatingActionButton(
           onPressed: () {
             Navigator.push(
@@ -93,35 +96,43 @@ class _OTPIndex extends State<OTPIndex> {
 
   @override
   Widget build(BuildContext context) {
-    return UserIdentify(
-        child: Scaffold(
-            appBar: AppBar(
-              title: Text("One Take Pass"),
-              titleTextStyle: TextStyle(fontWeight: FontWeight.w300),
-              centerTitle: true,
-            ),
-            body: _pmap.widgetList.elementAt(_currentIdx),
-            bottomNavigationBar: BottomNavigationBar(
-              currentIndex: _currentIdx,
-              items: _pmap.bnbItems,
-              onTap: _onTab,
-              backgroundColor: OTPColour.light1,
-              unselectedItemColor: OTPColour.light2,
-              selectedItemColor: OTPColour.dark2,
-            ),
-            floatingActionButton: _actionBtnMap(context)));
+    Scaffold _pageWithIdentityFactory(UserREST cur) {
+      var _ipmap = _pmap(cur);
+      return Scaffold(
+        appBar: AppBar(
+          title: Text("One Take Pass"),
+          titleTextStyle: TextStyle(fontWeight: FontWeight.w300),
+          centerTitle: true,
+        ),
+        body: _ipmap.widgetList.elementAt(_currentIdx),
+        bottomNavigationBar: BottomNavigationBar(
+          currentIndex: _currentIdx,
+          items: _ipmap.bnbItems,
+          onTap: _onTab,
+          backgroundColor: OTPColour.light1,
+          unselectedItemColor: OTPColour.light2,
+          selectedItemColor: OTPColour.dark2,
+        ),
+        floatingActionButton: _actionBtnMap(context, cur),
+      );
+    }
+
+    return UserIdentify(child: _pageWithIdentityFactory);
   }
 }
 
 class UserIdentify extends StatelessWidget {
   static bool _firstTime = true;
-  final Widget child;
+  final Widget Function(UserREST) child;
+  UserREST _currentLoginUser;
+
+  UserREST get currentLoginUser => _currentLoginUser;
 
   UserIdentify({@required this.child});
 
   ///When received user data
-  Widget _onSuccess(Widget child) {
-    return child;
+  Widget _onSuccess(Widget Function(UserREST) child, UserREST cur) {
+    return child(cur);
   }
 
   ///When user data can not receive
@@ -160,11 +171,11 @@ class UserIdentify extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
+    return FutureBuilder<UserREST>(
       future: _loginStatus(),
       builder: (context, userdata) {
         if (userdata.hasData) {
-          return _onSuccess(child);
+          return _onSuccess(child, userdata.data);
         } else if (userdata.hasError) {
           return _onFailed(context);
         }

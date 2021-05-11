@@ -1,9 +1,12 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 import 'package:one_take_pass_remake/api/url/localapiurl.dart';
 import 'package:one_take_pass_remake/api/userdata/gender.dart';
 import 'package:one_take_pass_remake/api/userdata/login_request.dart';
+import 'package:one_take_pass_remake/main.dart' show routeObserver;
 import 'package:one_take_pass_remake/pages/index.dart' show UserIdentify;
 import 'package:one_take_pass_remake/pages/login.dart';
 //import 'package:one_take_pass_remake/pages/reusable/link_google.dart';
@@ -21,7 +24,24 @@ Future<String> get _currentUsername async {
       .fullName;
 }
 
-class _OTPAbout extends State<OTPAbout> {
+class _OTPAbout extends State<OTPAbout> with RouteAware {
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    routeObserver.subscribe(this, ModalRoute.of(context));
+  }
+
+  @override
+  void dispose() {
+    routeObserver.unsubscribe(this);
+    super.dispose();
+  }
+
+  @override
+  void didPopNext() {
+    setState(() {});
+  }
+
   //_GoogleLink _gl = new _GoogleLink();
   //bool _status = true;
   @override
@@ -29,24 +49,6 @@ class _OTPAbout extends State<OTPAbout> {
     return Center(
         child: Column(children: [
       Padding(padding: EdgeInsets.only(top: 10)),
-      /*Container(
-        width: MediaQuery.of(context).size.width - 10,
-        child: MaterialButton(
-          padding: EdgeInsets.all(10),
-          color: Colors.blue,
-          child: Text((_status ? "Unlink" : "Link") + " to Google",
-              style: TextStyle(fontSize: 16, color: Colors.white)),
-          onPressed: () {
-            if (!_status) {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => LinkGoogleNotify()));
-            }
-            _status = !_status;
-            setState(() {});
-          },
-        ),
-      ),
-      Padding(padding: EdgeInsets.only(top: 5)),*/
       Expanded(
           child: Center(
         child: Column(
@@ -152,6 +154,7 @@ class EditProfile extends StatefulWidget {
 }
 
 class _EditProfile extends State<EditProfile> {
+  String _recentUsername;
   TextEditingController _nameController;
   Map<String, TextEditingController> _npwdInputCtrl;
 
@@ -163,6 +166,15 @@ class _EditProfile extends State<EditProfile> {
       "password": TextEditingController(),
       "confirm": TextEditingController()
     };
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _npwdInputCtrl.forEach((_, value) {
+      value.dispose();
+    });
+    super.dispose();
   }
 
   Widget optionUI(UserREST receivedInfo) {
@@ -199,7 +211,7 @@ class _EditProfile extends State<EditProfile> {
             obscureText: true,
             enableSuggestions: false,
             autocorrect: false,
-          )
+          ),
         ],
       ),
     );
@@ -214,29 +226,68 @@ class _EditProfile extends State<EditProfile> {
           actions: [
             TextButton(
                 onPressed: () async {
-                  Map<String, dynamic> getInputData() {
+                  Future<Map<String, dynamic>> getInputData() async {
                     bool errByMismatchedPwd = false;
-                    try {
+                    final reqBody = {
+                      "refresh_token": "",
+                    };
+                    if (_npwdInputCtrl["password"].text.isNotEmpty &&
+                        _npwdInputCtrl["confirm"].text.isNotEmpty) {
                       errByMismatchedPwd = (_npwdInputCtrl["password"].text !=
                           _npwdInputCtrl["confirm"].text);
                       if (errByMismatchedPwd) {
-                        throw "Stop process with mismatched password";
+                        await showDialog(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                                  title: Text("Password mismatched"),
+                                  content: Text(
+                                      "Please confirm you are entered the same password in confirm field."),
+                                ));
+                        return null;
+                      } else {
+                        reqBody["password"] = _npwdInputCtrl["password"].text;
                       }
-                      return {
-                        "refresh_token": "",
-                        "name": _nameController.text,
-                        "password": _npwdInputCtrl["password"].text
-                      };
+                    }
+                    if (_nameController.text.isNotEmpty &&
+                        _nameController.text != _recentUsername) {
+                      reqBody["name"] = _nameController.text;
+                    }
+                    return reqBody;
+                  }
+
+                  var actualresp = "";
+
+                  String token = await UserTokenLocalStorage.getToken();
+                  final Map<String, dynamic> _editedForm = await getInputData();
+                  if (_editedForm != null) {
+                    _editedForm["refresh_token"] = token;
+                    var dio = Dio();
+                    dio.options.headers['Content-Type'] = "application/json";
+
+                    try {
+                      await dio.post(APISitemap.updateInfo.toString(),
+                          data: jsonEncode(_editedForm));
+                      showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                                title: Text("Your record has been updated"),
+                                actions: [
+                                  TextButton(
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      },
+                                      child: Text("OK"))
+                                ],
+                              )).then((_) {
+                        Navigator.pop(context);
+                      });
                     } catch (err) {
                       showDialog(
                           context: context,
                           builder: (context) => AlertDialog(
-                                title: Text(errByMismatchedPwd
-                                    ? "Password and confirm password mismatched"
-                                    : "Failed to get your edited data"),
-                                content: Text(errByMismatchedPwd
-                                    ? "Please ensure your new password and confirm password should be the same"
-                                    : "Your data is not loaded yet, please try again later."),
+                                title: Text("Update failed"),
+                                content:
+                                    Text("Try again later.\n" + actualresp),
                                 actions: [
                                   TextButton(
                                       onPressed: () {
@@ -246,33 +297,6 @@ class _EditProfile extends State<EditProfile> {
                                 ],
                               ));
                     }
-                  }
-
-                  try {
-                    String token = await UserTokenLocalStorage.getToken();
-                    Map<String, dynamic> _editedForm = getInputData();
-                    _editedForm["refresh_token"] = token;
-                    var dio = Dio();
-                    dio.options.headers['Content-Type'] = "application/json";
-                    var resp = await dio.post(APISitemap.updateInfo.toString(),
-                        data: _editedForm);
-                    if (resp.data["msg"] != "Update record successfully") {
-                      throw "Update failed";
-                    }
-                  } catch (err) {
-                    showDialog(
-                        context: context,
-                        builder: (context) => AlertDialog(
-                              title: Text("Update failed"),
-                              content: Text("Try again later."),
-                              actions: [
-                                TextButton(
-                                    onPressed: () {
-                                      Navigator.pop(context);
-                                    },
-                                    child: Text("OK"))
-                              ],
-                            ));
                   }
                 },
                 child: Text(
@@ -288,7 +312,7 @@ class _EditProfile extends State<EditProfile> {
           })(),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
-              _nameController.text = snapshot.data.fullName;
+              _recentUsername = _nameController.text = snapshot.data.fullName;
               return optionUI(snapshot.data);
             } else if (snapshot.hasError) {
               return Center(

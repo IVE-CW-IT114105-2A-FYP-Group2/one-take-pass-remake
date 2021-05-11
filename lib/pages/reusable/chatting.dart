@@ -1,7 +1,12 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:one_take_pass_remake/api/userdata/login_request.dart';
 import 'package:one_take_pass_remake/themes.dart';
+import 'package:web_socket_channel/io.dart';
 
 class ChatComm extends StatefulWidget {
+  //final wschat = IOWebSocketChannel.connect('ws://localhost:443');
   final String name;
   ChatComm({@required this.name});
   @override
@@ -10,7 +15,7 @@ class ChatComm extends StatefulWidget {
 
 class _ChatComm extends State<ChatComm> {
   TextEditingController _controller;
-  List<Widget> _chatElements = [_ChatElements._getMsgBox("Hi", false)];
+  List<Widget> _chatElements = [];
 
   @override
   void initState() {
@@ -31,49 +36,98 @@ class _ChatComm extends State<ChatComm> {
           title: Text(widget.name),
           centerTitle: true,
         ),
-        body: Stack(
-          children: [
-            Container(
-              width: MediaQuery.of(context).size.width,
-              height: MediaQuery.of(context).size.height,
-              child: ListView.builder(
-                  itemCount: _chatElements.length,
-                  itemBuilder: (context, count) => _chatElements[count]),
-            ),
-            Positioned(
-              child: Container(
-                width: MediaQuery.of(context).size.width,
-                height: 48,
-                child: Row(
-                  children: [
-                    Container(
-                      width: MediaQuery.of(context).size.width - 100,
-                      child: TextField(
-                        controller: _controller,
-                        decoration: InputDecoration(
-                            border: OutlineInputBorder(), labelText: "Message"),
-                      ),
-                    ),
-                    Container(
-                        height: 48,
-                        width: 100,
-                        child: MaterialButton(
-                            color: OTPColour.light2,
-                            child: Text("Send"),
-                            onPressed: () {
-                              _chatElements.add(_ChatElements._getMsgBox(
-                                  _controller.text, true));
-                              setState(() {
-                                _controller.clear();
+        body: FutureBuilder<String>(
+            future: (<String>() async {
+              return (await UserAPIHandler.getUserRest(
+                      await UserTokenLocalStorage.getToken()))
+                  .fullName;
+            }()),
+            builder: (context, cu) {
+              if (cu.hasData) {
+                return StatefulBuilder(builder: (context, sentState) {
+                  return Stack(
+                    children: [
+                      Container(
+                          width: MediaQuery.of(context).size.width,
+                          height: MediaQuery.of(context).size.height,
+                          child:
+                              /*StreamBuilder(
+                        stream: widget.wschat.stream,
+                        builder: (context, msgobj) {
+                          if (msgobj.hasData) {
+                            var wsd = (msgobj.data is String)
+                                ? jsonDecode(msgobj.data)
+                                : msgobj.data;
+                            return StatefulBuilder(
+                                builder: (context, msgState) {
+                              msgState(() {
+                                _chatElements.add(_ChatElements._getMsgBox(
+                                    wsd["msg"], (cu.data == wsd["from"])));
                               });
-                            }))
-                  ],
-                ),
-              ),
-              bottom: 0,
-            )
-          ],
-        ));
+                              return ListView.builder(
+                                  itemCount: _chatElements.length,
+                                  itemBuilder: (context, msgpos) =>
+                                      _chatElements[msgpos]);
+                            });
+                          }
+                          return ListView.builder(
+                              itemCount: _chatElements.length,
+                              itemBuilder: (context, msgpos) =>
+                                  _chatElements[msgpos]);
+                        },
+                      ),*/
+                              ListView.builder(
+                                  itemCount: _chatElements.length,
+                                  itemBuilder: (context, msgpos) =>
+                                      _chatElements[msgpos])),
+                      Positioned(
+                        child: Container(
+                          width: MediaQuery.of(context).size.width,
+                          height: 48,
+                          child: Row(
+                            children: [
+                              Container(
+                                width: MediaQuery.of(context).size.width - 100,
+                                child: TextField(
+                                  controller: _controller,
+                                  decoration: InputDecoration(
+                                      border: OutlineInputBorder(),
+                                      labelText: "Message"),
+                                ),
+                              ),
+                              Container(
+                                  height: 48,
+                                  width: 100,
+                                  child: MaterialButton(
+                                      color: OTPColour.light2,
+                                      child: Text("Send"),
+                                      onPressed: () {
+                                        if (_controller.text.isNotEmpty) {
+                                          /*widget.wschat.sink.add(jsonEncode({
+                                            "msg": _controller.text,
+                                            "from": cu.data,
+                                            "to": widget.name
+                                          }));*/
+                                          _chatElements.add(
+                                              _ChatElements._getMsgBox(
+                                                  _controller.text, true));
+                                          sentState(() {
+                                            _controller.clear();
+                                          });
+                                        }
+                                      }))
+                            ],
+                          ),
+                        ),
+                        bottom: 0,
+                      )
+                    ],
+                  );
+                });
+              } else {
+                return Container();
+              }
+            }));
   }
 }
 
