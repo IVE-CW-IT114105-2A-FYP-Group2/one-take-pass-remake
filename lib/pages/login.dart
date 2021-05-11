@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_login/flutter_login.dart';
@@ -74,19 +76,19 @@ class OTPLogin extends StatelessWidget {
             //API caller
             var dio = Dio();
             dio.options.headers["Content-Type"] = "application/json";
-            var signUpResp =
-                await dio.post(APISitemap.signup.toString(), data: {
-              "phoneno": phoneNo,
-              "password": pwd,
-              "username": uname,
-              "gender": genderInStr,
-              "type": roleInStr
-            });
+            var signUpResp = await dio.post(APISitemap.signup.toString(),
+                data: jsonEncode({
+                  "phoneno": phoneNo,
+                  "password": pwd,
+                  "username": uname,
+                  "gender": genderInStr,
+                  "type": roleInStr
+                }));
             if (signUpResp.statusCode >= 400) {
               return false;
             }
             //Should be more handler
-            return signUpResp.data["msg"] == "Signup successfully";
+            return true;
           }
 
           //Function behaviours
