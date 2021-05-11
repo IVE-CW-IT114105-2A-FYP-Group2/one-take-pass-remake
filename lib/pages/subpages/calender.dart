@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'package:intl/intl.dart' show DateFormat;
-import 'package:one_take_pass_remake/api/misc.dart' show RegexLibraries;
 import 'package:one_take_pass_remake/main.dart' show routeObserver;
 import 'package:one_take_pass_remake/themes.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -60,23 +59,6 @@ class _OTPCalender extends State<OTPCalender> with RouteAware {
 
   ///All interface about calendar
   Widget calendarInterface(BuildContext context, List<dynamic> receivedEvents) {
-    /*List<Event> eventGetterByDay(DateTime dt) {
-      try {
-        return receivedEvents.where((eventInfo) {
-          EventDateTime eDT = eventInfo.start;
-          String dateAsStr = DateFormat(DateFormat.YEAR_NUM_MONTH_DAY).format(
-              eDT.date ?? eDT.dateTime); //Pick the date that is not null
-          return (dateAsStr ==
-                  DateFormat(DateFormat.YEAR_NUM_MONTH_DAY).format(dt)) &&
-              (eventInfo.description == _descIden);
-        }).toList();
-      } catch (filter_error) {
-        print("Has error");
-        //If caught error as moy be no event found
-        return [];
-      }
-    }*/
-
     return StatefulBuilder(
         builder: (context, setInnerState) => Column(children: [
               TableCalendar(
@@ -168,13 +150,7 @@ class _OTPCalender extends State<OTPCalender> with RouteAware {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<dynamic>>(
-        future: Future.delayed(
-            Duration(seconds: 1),
-            () =>
-                []) /*Future.value(_CApiManager.grant
-            .then((capi) => capi.events.list(GCalAPIHandler.calId))
-            .then((value) => value.items))*/
-        ,
+        future: Future.delayed(Duration(seconds: 1), () => []),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(
@@ -387,16 +363,6 @@ class _OTPCalenderEventAdder extends State<OTPCalenderEventAdder> {
                           ));
                 } else {
                   //Insert event handler
-                  /*_CApiManager.grant.then((capi) {
-                    insertEvent(capi);
-                  });*/
-
-                  /*InsertEvent(
-                          from: _eventsMap["start"],
-                          to: _eventsMap["end"],
-                          summary: _controllers["summary"].text,
-                          repeatDay: _selectedDay,
-                          attendees: getEmailListStr())*/
 
                 }
               },
