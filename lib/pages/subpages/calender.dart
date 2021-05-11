@@ -40,7 +40,7 @@ class _OTPCalender extends State<OTPCalender> with RouteAware {
   //Defile current calender display format
   CalendarFormat _format = CalendarFormat.month;
 
-  List<Event> _pickedEvent = [];
+  //List<Event> _pickedEvent = [];
 
   @override
   void initState() {
@@ -77,7 +77,7 @@ class _OTPCalender extends State<OTPCalender> with RouteAware {
 
   ///All interface about calendar
   Widget calendarInterface(BuildContext context, List<Event> receivedEvents) {
-    List<Event> eventGetterByDay(DateTime dt) {
+    /*List<Event> eventGetterByDay(DateTime dt) {
       try {
         return receivedEvents.where((eventInfo) {
           EventDateTime eDT = eventInfo.start;
@@ -92,7 +92,7 @@ class _OTPCalender extends State<OTPCalender> with RouteAware {
         //If caught error as moy be no event found
         return [];
       }
-    }
+    }*/
 
     return StatefulBuilder(
         builder: (context, setInnerState) => Column(children: [
@@ -119,7 +119,7 @@ class _OTPCalender extends State<OTPCalender> with RouteAware {
                   setInnerState(() {
                     _selectedDate = selected;
                     _focusedDate = focused;
-                    _pickedEvent = eventGetterByDay(selected);
+                    //_pickedEvent = eventGetterByDay(selected);
                   });
                 },
                 calendarFormat: _format,
@@ -132,19 +132,19 @@ class _OTPCalender extends State<OTPCalender> with RouteAware {
                   });
                 },
                 eventLoader: (dt) {
-                  return eventGetterByDay(dt);
+                  return []; //eventGetterByDay(dt);
                 },
               ),
               Expanded(
                 child: ListView.builder(
                     padding: EdgeInsets.all(5),
-                    itemCount: _pickedEvent.length,
+                    itemCount: 3, //_pickedEvent.length,
                     itemBuilder: (context, count) => GestureDetector(
                         onTap: () async {
                           //When click the event, open in google calendar
-                          if (await canLaunch(_pickedEvent[count].htmlLink)) {
+                          /*if (await canLaunch(_pickedEvent[count].htmlLink)) {
                             await launch(_pickedEvent[count].htmlLink);
-                          }
+                          }*/
                         },
                         child: Container(
                           width: MediaQuery.of(context).size.width,
@@ -154,7 +154,7 @@ class _OTPCalender extends State<OTPCalender> with RouteAware {
                           decoration: BoxDecoration(
                               border: Border.all(
                                   color: OTPColour.mainTheme, width: 1.5)),
-                          child: Column(
+                          /*child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
@@ -176,7 +176,7 @@ class _OTPCalender extends State<OTPCalender> with RouteAware {
                                 style: TextStyle(fontSize: 16),
                               ),
                             ],
-                          ),
+                          ),*/
                         ))),
               )
             ]));
@@ -185,9 +185,13 @@ class _OTPCalender extends State<OTPCalender> with RouteAware {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<Event>>(
-        future: Future.value(_CApiManager.grant
+        future: Future.delayed(
+            Duration(seconds: 1),
+            () =>
+                []) /*Future.value(_CApiManager.grant
             .then((capi) => capi.events.list(GCalAPIHandler.calId))
-            .then((value) => value.items)),
+            .then((value) => value.items))*/
+        ,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(
@@ -332,6 +336,7 @@ class _OTPCalenderEventAdder extends State<OTPCalenderEventAdder> {
                 ],
               ));
     } else {
+      /*
       //It's keep insert until the end of the date
       while (cwd.isBefore(_eventsMap["end"])) {
         //When cwd's weekday is assign to repeated
@@ -397,6 +402,7 @@ class _OTPCalenderEventAdder extends State<OTPCalenderEventAdder> {
         }
         cwd = cwd.add(Duration(days: 1));
       }
+      */
     }
   }
 
@@ -441,9 +447,9 @@ class _OTPCalenderEventAdder extends State<OTPCalenderEventAdder> {
                           ));
                 } else {
                   //Insert event handler
-                  _CApiManager.grant.then((capi) {
+                  /*_CApiManager.grant.then((capi) {
                     insertEvent(capi);
-                  });
+                  });*/
 
                   /*InsertEvent(
                           from: _eventsMap["start"],

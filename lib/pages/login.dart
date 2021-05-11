@@ -21,7 +21,7 @@ class OTPLogin extends StatelessWidget {
       case "errors_server":
         return "There is an error from server, please try again later"; //When server malfunction
       case "student":
-      case "instructor":
+      case "privateDrivingInstructor":
         return null; //Use null for success according to API reference
       case "staff":
         await UserTokenLocalStorage.clearToken();
