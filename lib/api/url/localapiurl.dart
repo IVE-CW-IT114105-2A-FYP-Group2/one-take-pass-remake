@@ -9,6 +9,10 @@ class APISitemap {
     return Uri.https(_apiUrl, 'signup');
   }
 
+  static Uri get deleteUser {
+    return Uri.https(_apiUrl, 'deleteuser');
+  }
+
   static Uri get postAns {
     return Uri.https(_apiUrl, 'question/ask');
   }

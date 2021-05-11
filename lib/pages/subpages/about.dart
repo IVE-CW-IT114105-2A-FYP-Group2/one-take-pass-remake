@@ -212,6 +212,122 @@ class _EditProfile extends State<EditProfile> {
             enableSuggestions: false,
             autocorrect: false,
           ),
+          /*
+          Container(
+            margin: EdgeInsets.only(top: 100),
+            width: MediaQuery.of(context).size.width,
+            child: MaterialButton(
+              color: Colors.red,
+              padding: EdgeInsets.all(10),
+              child: Text(
+                "Long press to delete account",
+                style: TextStyle(fontSize: 18),
+              ),
+              onPressed: () {},
+              onLongPress: () async {
+                bool _confirmDelete = false;
+
+                void doPop(BuildContext context) {
+                  Navigator.pop(context);
+                }
+
+                void onYes(BuildContext context) {
+                  _confirmDelete = true;
+                  doPop(context);
+                }
+
+                void onNo(BuildContext context) {
+                  _confirmDelete = false;
+                  doPop(context);
+                }
+
+                await showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                          title: Text("Delete Account"),
+                          content: Text("Ensure to delete account?"),
+                          actions: [
+                            TextButton(
+                                onPressed: () => onYes(context),
+                                child: Text(
+                                  "Yes",
+                                  style: TextStyle(color: Colors.red),
+                                )),
+                            TextButton(
+                                onPressed: () => onNo(context),
+                                child: Text("No"))
+                          ],
+                        ));
+
+                if (_confirmDelete) {
+                  await showDialog(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                            title: Text("Delete Account"),
+                            content: Text(
+                                "Your data will not be recovered after deleted, continue?"),
+                            actions: [
+                              TextButton(
+                                  onPressed: () => onYes(context),
+                                  child: Text(
+                                    "Yes",
+                                    style: TextStyle(color: Colors.red),
+                                  )),
+                              TextButton(
+                                  onPressed: () => onNo(context),
+                                  child: Text("No"))
+                            ],
+                          ));
+                  if (_confirmDelete) {
+                    String currentToken =
+                        await UserTokenLocalStorage.getToken();
+                    try {
+                      var dio = Dio();
+                      dio.options.headers["Content-Type"] = "application/json";
+                      var resp = await dio.post(
+                          APISitemap.deleteUser.toString(),
+                          data: jsonEncode({
+                            "refresh_token": currentToken,
+                            "userPhoneNumber": receivedInfo.phoneNo
+                          }));
+                      if (resp.statusCode >= 400) {
+                        throw "HTTP error";
+                      }
+                      await showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                                title: Text("You account has been deleted"),
+                                actions: [
+                                  TextButton(
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      },
+                                      child: Text("OK"))
+                                ],
+                              )).then((_) {
+                        UserTokenLocalStorage.clearToken().then((_) {
+                          requireLogin(ModalRoute.of(context), context);
+                        });
+                      });
+                    } catch (e) {
+                      showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                                title: Text("Delete Account failed"),
+                                actions: [
+                                  TextButton(
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      },
+                                      child: Text("OK"))
+                                ],
+                              ));
+                    }
+                  }
+                }
+              },
+            ),
+          ),*/
         ],
       ),
     );
