@@ -13,7 +13,7 @@ class OTPHome extends StatelessWidget {
     return Container(
       margin: EdgeInsets.all(5),
       padding: EdgeInsets.all(5),
-      child: _FindDriver(),
+      child: _IncomingRequest(),
     );
   }
 }
@@ -162,5 +162,89 @@ class _SearchList extends StatelessWidget {
           //I don't know what status is it
           return Center();
         });
+  }
+}
+
+class _IncomingRequest extends StatefulWidget {
+  @override
+  State<StatefulWidget> createState() => _IncomingRequestUI();
+}
+
+class _IncomingRequestUI extends State<_IncomingRequest> {
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<List<OTPUsers>>(
+      future: Future.delayed(
+          Duration(seconds: 1), () => [OTPUsers("Foo"), OTPUsers("Bar")]),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        } else {
+          if (snapshot.hasData) {
+            return Container(
+                width: MediaQuery.of(context).size.width,
+                height: MediaQuery.of(context).size.height,
+                child: Column(children: [
+                  Padding(
+                    child: Text(
+                      "Incoming request from students",
+                      style: TextStyle(fontSize: 16),
+                      textAlign: TextAlign.center,
+                    ),
+                    padding: EdgeInsets.only(bottom: 5),
+                  ),
+                  Expanded(
+                      child: ListView.builder(
+                          itemCount: snapshot.data.length,
+                          itemBuilder: (context, count) => Container(
+                                height: 75,
+                                child: Stack(
+                                  children: [
+                                    Text(
+                                      snapshot.data[count].name,
+                                      style: TextStyle(fontSize: 18),
+                                    ),
+                                    Positioned(
+                                        right: 0,
+                                        child: Container(
+                                          child: Row(
+                                            children: [
+                                              MaterialButton(
+                                                onPressed: () {},
+                                                child: Text("Accept"),
+                                              ),
+                                              MaterialButton(
+                                                  onPressed: () {},
+                                                  child: Text("Reject"))
+                                            ],
+                                          ),
+                                        ))
+                                  ],
+                                ),
+                              )))
+                ]));
+          } else {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Icon(
+                    CupertinoIcons.xmark_circle,
+                    size: 120,
+                  ),
+                  Text(
+                    "Sorry, we can't fetch incoming request",
+                    style: TextStyle(fontSize: 24),
+                  )
+                ],
+              ),
+            );
+          }
+        }
+      },
+    );
   }
 }
