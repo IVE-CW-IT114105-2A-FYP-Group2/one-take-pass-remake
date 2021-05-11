@@ -93,7 +93,9 @@ class InstructorInfo extends StatelessWidget {
           _heading(context),
           _details(),
           Divider(color: colourPicker(128, 128, 128, 120)),
-          Center(
+          Container(
+            margin: EdgeInsets.all(10),
+            width: MediaQuery.of(context).size.width,
             child: MaterialButton(
               color: OTPColour.light1,
               onPressed: () async {
@@ -115,6 +117,17 @@ class InstructorInfo extends StatelessWidget {
                 }
               },
               child: Text("Open chat"),
+            ),
+          ),
+          Container(
+            margin: EdgeInsets.all(10),
+            width: MediaQuery.of(context).size.width,
+            child: MaterialButton(
+              color: OTPColour.light1,
+              onPressed: () async {
+                //Nothing now
+              },
+              child: Text("Apply courses"),
             ),
           )
         ],

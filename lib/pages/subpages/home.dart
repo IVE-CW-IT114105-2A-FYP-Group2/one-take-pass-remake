@@ -173,6 +173,7 @@ class _SearchList extends StatelessWidget {
   }
 }
 
+///Instructor exclusive page for accepting or rejecting student to attnd the courses
 class _IncomingRequest extends StatefulWidget {
   @override
   State<StatefulWidget> createState() => _IncomingRequestUI();
