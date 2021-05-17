@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:one_take_pass_remake/api/userdata/login_request.dart';
 import 'package:one_take_pass_remake/pages/login.dart';
 import 'package:one_take_pass_remake/themes.dart';
@@ -78,14 +79,37 @@ class _OTPIndex extends State<OTPIndex> {
         if (cur.roles == "student") {
           return null;
         }
+        void addCoursesPage() {
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => OTPCalenderEventAdder()));
+        }
         return FloatingActionButton(
-          onPressed: () {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => OTPCalenderEventAdder()));
-          },
-          child: Icon(Icons.add),
+          onPressed: () {},
+          child: GestureDetector(
+            onTap: () {
+              addCoursesPage();
+            },
+            onLongPress: () {
+              showDialog(
+                  context: context,
+                  builder: (context) => SimpleDialog(
+                        title: Text("Action"),
+                        children: [
+                          TextButton(
+                              onPressed: () {
+                                addCoursesPage();
+                              },
+                              child: Text(
+                                "Add new courses",
+                                style: TextStyle(fontWeight: FontWeight.w700),
+                              )),
+                          TextButton(
+                              onPressed: () {}, child: Text("View courses"))
+                        ],
+                      ));
+            },
+            child: Icon(FontAwesomeIcons.calendar),
+          ),
           mini: false,
           tooltip: "Add courses",
         );

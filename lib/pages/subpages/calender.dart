@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:date_time_picker/date_time_picker.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -9,6 +10,7 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart' show DateFormat;
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:one_take_pass_remake/api/calendar/calendar.dart';
+import 'package:one_take_pass_remake/api/url/localapiurl.dart';
 import 'package:one_take_pass_remake/api/userdata/login_request.dart';
 import 'package:one_take_pass_remake/main.dart' show routeObserver;
 import 'package:one_take_pass_remake/themes.dart';
@@ -356,7 +358,43 @@ class _OTPCalenderEventAdder extends State<OTPCalenderEventAdder> {
                   //Get token before submit
                   UserTokenLocalStorage.getToken().then((token) {
                     course["refresh_token"] = token;
-                    print(jsonEncode(course));
+                    return jsonEncode(course);
+                  }).then((restCourse) async {
+                    var dio = Dio();
+                    dio.options.headers["Content-Type"] = "application/json";
+                    var resp = await dio.post(
+                        APISitemap.courseControl("add").toString(),
+                        data: restCourse);
+                  }).then((_) {
+                    showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                              title: Text("The courses has been created"),
+                              actions: [
+                                TextButton(
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    },
+                                    child: Text("OK"))
+                              ],
+                            )).then((_) {
+                      //Auto exit
+                      Navigator.pop(context);
+                    });
+                  }).onError((_, __) {
+                    showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                              title: Text("Network error"),
+                              content: Text("Please try again later"),
+                              actions: [
+                                TextButton(
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    },
+                                    child: Text("OK"))
+                              ],
+                            ));
                   });
                 }
               },
@@ -446,5 +484,24 @@ class _OTPCalenderEventAdder extends State<OTPCalenderEventAdder> {
         ]),
       ),
     );
+  }
+}
+
+class OTPListExistedCourses extends StatefulWidget {
+  Future<List<CoursesCalendar>> get ownerCourses async {
+    List<CoursesCalendar> buffer = [];
+    var dio = Dio();
+  }
+
+  @override
+  State<StatefulWidget> createState() => _OTPListExistedCourses();
+}
+
+class _OTPListExistedCourses extends State<OTPListExistedCourses> {
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<List<CoursesCalendar>>(builder: (context, snapshot) {
+      return null;
+    });
   }
 }
