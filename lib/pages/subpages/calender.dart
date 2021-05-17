@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 
 import 'package:intl/intl.dart' show DateFormat;
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:one_take_pass_remake/api/calendar/calendar.dart';
 import 'package:one_take_pass_remake/api/userdata/login_request.dart';
 import 'package:one_take_pass_remake/main.dart' show routeObserver;
 import 'package:one_take_pass_remake/themes.dart';
@@ -216,13 +217,9 @@ class _OTPCalenderEventAdder extends State<OTPCalenderEventAdder> {
     "end": DateTime.now().add(Duration(hours: 1))
   };
 
-  Future<Map<String, dynamic>> _courseMaker(
-      String title,
-      String carType,
-      DateTime startRange,
-      DateTime endRange,
-      Map<int, bool> repeatedWeekdate) async {
-    Map<String, String> _dtToRESTJsonFactory(DateTime start, DateTime end) {
+  CoursesCalendar _courseMaker(String title, String carType,
+      DateTime startRange, DateTime endRange, Map<int, bool> repeatedWeekdate) {
+    TimeRange _dtToRESTJsonFactory(DateTime start, DateTime end) {
       String exporter(DateTime dt) {
         // Default uses en_US which SWAPPED POSITION OF MONTH AND DATE
         String date = DateFormat.yMd('en_GB').format(dt).replaceAll("/", "-");
@@ -230,12 +227,11 @@ class _OTPCalenderEventAdder extends State<OTPCalenderEventAdder> {
         return date + " " + time;
       }
 
-      return {"start": exporter(start), "stop": exporter(end)};
+      return TimeRange(startTime: exporter(start), endTime: exporter(end));
     }
 
-    List<Map<String, String>> _coursesTimeFactory(
-        DateTime start, DateTime end) {
-      List<Map<String, String>> coursesTime = [];
+    List<TimeRange> _coursesTimeFactory(DateTime start, DateTime end) {
+      List<TimeRange> coursesTime = [];
       DateTime chdt = start; //Current handle date time
       int rangeInSec() {
         int toSec(DateTime t) =>
@@ -254,12 +250,8 @@ class _OTPCalenderEventAdder extends State<OTPCalenderEventAdder> {
       return coursesTime;
     }
 
-    return {
-      "refresh_token": (await UserTokenLocalStorage.getToken()),
-      "title": title,
-      "type": carType,
-      "course_time": _coursesTimeFactory(startRange, endRange)
-    };
+    return CoursesCalendar(
+        title, carType, _coursesTimeFactory(startRange, endRange));
   }
 
   @override
@@ -334,10 +326,37 @@ class _OTPCalenderEventAdder extends State<OTPCalenderEventAdder> {
                           ));
                 } else {
                   //Insert event handler
-                  _courseMaker(_controllers["summary"].text, _currentCarType,
-                          _eventsMap["start"], _eventsMap["end"], _wdMapper)
-                      .then((obj) {
-                    print(jsonEncode(obj));
+                  Map<String, dynamic> course;
+                  try {
+                    course = _courseMaker(
+                            _controllers["summary"].text,
+                            _currentCarType,
+                            _eventsMap["start"],
+                            _eventsMap["end"],
+                            _wdMapper)
+                        .toJson;
+                  } catch (invalid_set) {
+                    showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                              title: Text("Date and time setting error"),
+                              content: Text(
+                                  "The weekday you did not picked or picked out of the range"),
+                              actions: [
+                                TextButton(
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    },
+                                    child: Text("OK"))
+                              ],
+                            ));
+                    return;
+                  }
+
+                  //Get token before submit
+                  UserTokenLocalStorage.getToken().then((token) {
+                    course["refresh_token"] = token;
+                    print(jsonEncode(course));
                   });
                 }
               },
