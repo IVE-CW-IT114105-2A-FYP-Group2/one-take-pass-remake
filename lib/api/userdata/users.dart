@@ -12,9 +12,11 @@ export 'package:one_take_pass_remake/api/userdata/gender.dart';
 
 class OTPUsers {
   String name;
+  String userPhoneNumber;
 
-  OTPUsers(String name) {
+  OTPUsers(String name, [String userPhoneNumber = ""]) {
     this.name = name;
+    this.userPhoneNumber = userPhoneNumber;
   }
 }
 
@@ -24,9 +26,9 @@ class Instructor extends OTPUsers {
   HKDistrict hkDistrict;
   String vehicles;
 
-  Instructor(String name, String desc, Personality personality,
-      HKDistrict hkDistrict, String vehicles)
-      : super(name) {
+  Instructor(String name, String userPhoneNumber, String desc,
+      Personality personality, HKDistrict hkDistrict, String vehicles)
+      : super(name, userPhoneNumber) {
     this.desc = desc;
     this.personality = personality;
     this.hkDistrict = hkDistrict;
@@ -36,6 +38,7 @@ class Instructor extends OTPUsers {
   factory Instructor.fromJSON(Map<String, dynamic> json) {
     return Instructor(
         json["name"],
+        json["userPhoneNumber"],
         json["description"],
         PersonalityGetter.getEnumObj(json["instructionStyle"]),
         HKDistrictGetter.getEnumObj(json["location"]),
@@ -46,6 +49,7 @@ class Instructor extends OTPUsers {
     return [
       Instructor(
         "John Siu",
+        "12345670",
         "Serious",
         Personality.calm,
         HKDistrict.est,
@@ -53,6 +57,7 @@ class Instructor extends OTPUsers {
       ),
       Instructor(
         "Polly Chan",
+        "09876543",
         "I love cars",
         Personality.easy_going,
         HKDistrict.ssp,

@@ -99,22 +99,17 @@ class InstructorInfo extends StatelessWidget {
             child: MaterialButton(
               color: OTPColour.light1,
               onPressed: () async {
-                SharedPreferences prefs = await SharedPreferences.getInstance();
-                try {
-                  List<String> ccl = prefs.getStringList(contentKey);
-                  if (!ccl.contains(instructor.name)) {
-                    ccl.add(instructor.name);
-                    await prefs.setStringList(contentKey, ccl);
-                  }
-                } catch (noContent) {
-                  await prefs.setStringList(contentKey, [instructor.name]);
-                } finally {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) =>
-                              ChatComm(name: instructor.name)));
-                }
+                var token = await UserTokenLocalStorage.getToken();
+
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => ChatComm(
+                              pickedRESTResult: {
+                                "refresh_token": token,
+                                "userPhoneNumber": instructor.userPhoneNumber
+                              },
+                            )));
               },
               child: Text("Open chat"),
             ),
