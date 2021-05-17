@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:date_time_picker/date_time_picker.dart';
 import 'package:flutter/cupertino.dart' show CupertinoIcons;
@@ -6,6 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'package:intl/intl.dart' show DateFormat;
+import 'package:intl/date_symbol_data_local.dart';
+import 'package:one_take_pass_remake/api/userdata/login_request.dart';
 import 'package:one_take_pass_remake/main.dart' show routeObserver;
 import 'package:one_take_pass_remake/themes.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -44,17 +47,6 @@ class _OTPCalender extends State<OTPCalender> with RouteAware {
   @override
   void didPopNext() {
     setState(() {});
-  }
-
-  ///Show empty string if [dt] is null
-  ///
-  ///That because some event don't store in dateTime in Google Calendar
-  String _timeDisplayHandler(DateTime dt) {
-    try {
-      return DateFormat("Hm").format(dt);
-    } catch (null_datetime) {
-      return "";
-    }
   }
 
   ///All interface about calendar
@@ -195,16 +187,23 @@ class OTPCalenderEventAdder extends StatefulWidget {
 
 ///An interface that add a event to Google Calendar
 class _OTPCalenderEventAdder extends State<OTPCalenderEventAdder> {
-  ///Selected which day will repeated
-  final Map<String, bool> _selectedDay = {
-    "mon": false,
-    "tue": false,
-    "wed": false,
-    "thur": false,
-    "fri": false,
-    "sat": false,
-    "sun": false
+  static final List<String> _availableCarTypes = [
+    "Private Car",
+    "Goods Vehicle",
+    "Bus"
+  ];
+
+  final Map<int, bool> _wdMapper = {
+    DateTime.monday: false,
+    DateTime.tuesday: false,
+    DateTime.wednesday: false,
+    DateTime.thursday: false,
+    DateTime.friday: false,
+    DateTime.saturday: false,
+    DateTime.sunday: false
   };
+
+  String _currentCarType = _availableCarTypes[0];
 
   ///Controller for [TextField]
   Map<String, TextEditingController> _controllers;
@@ -217,45 +216,57 @@ class _OTPCalenderEventAdder extends State<OTPCalenderEventAdder> {
     "end": DateTime.now().add(Duration(hours: 1))
   };
 
-  ///A lazy way to assign [_selectedDay] to define repeated day
-  void _assignDayVal(String day, bool newVal) {
-    _selectedDay[day] = newVal;
-  }
+  Future<Map<String, dynamic>> _courseMaker(
+      String title,
+      String carType,
+      DateTime startRange,
+      DateTime endRange,
+      Map<int, bool> repeatedWeekdate) async {
+    Map<String, String> _dtToRESTJsonFactory(DateTime start, DateTime end) {
+      String exporter(DateTime dt) {
+        // Default uses en_US which SWAPPED POSITION OF MONTH AND DATE
+        String date = DateFormat.yMd('en_GB').format(dt).replaceAll("/", "-");
+        String time = DateFormat.Hm('en_GB').format(dt) + ":00";
+        return date + " " + time;
+      }
 
-  ///Convert Map's key to DateTime's enum ints
-  String repeatDayKeyConverter(int weekday) {
-    switch (weekday) {
-      case DateTime.monday:
-        return "mon";
-      case DateTime.tuesday:
-        return "tue";
-      case DateTime.wednesday:
-        return "wed";
-      case DateTime.thursday:
-        return "thur";
-      case DateTime.friday:
-        return "fri";
-      case DateTime.saturday:
-        return "sat";
-      case DateTime.sunday:
-        return "sun";
-      default:
-        throw "Invalid day";
+      return {"start": exporter(start), "stop": exporter(end)};
     }
-  }
 
-  ///Uses for unified date format
-  String getCWDDate(DateTime c) {
-    return DateFormat("yyyy-MM-dd").format(c);
+    List<Map<String, String>> _coursesTimeFactory(
+        DateTime start, DateTime end) {
+      List<Map<String, String>> coursesTime = [];
+      DateTime chdt = start; //Current handle date time
+      int rangeInSec() {
+        int toSec(DateTime t) =>
+            (t.hour * 60 * 60) + (t.minute * 60) + t.second;
+        return toSec(end) - toSec(start);
+      }
+
+      while (end.isAfter(chdt)) {
+        if (repeatedWeekdate[chdt.weekday]) {
+          DateTime chdte = chdt.add(Duration(seconds: rangeInSec()));
+          coursesTime.add(_dtToRESTJsonFactory(chdt, chdte));
+        }
+        chdt = chdt.add(Duration(days: 1));
+      }
+
+      return coursesTime;
+    }
+
+    return {
+      "refresh_token": (await UserTokenLocalStorage.getToken()),
+      "title": title,
+      "type": carType,
+      "course_time": _coursesTimeFactory(startRange, endRange)
+    };
   }
 
   @override
   void initState() {
     super.initState();
-    _controllers = {
-      "summary": TextEditingController(),
-      "attendees": TextEditingController()
-    };
+    initializeDateFormatting();
+    _controllers = {"summary": TextEditingController()};
   }
 
   @override
@@ -268,79 +279,39 @@ class _OTPCalenderEventAdder extends State<OTPCalenderEventAdder> {
 
   @override
   Widget build(BuildContext context) {
-    //Widget sets
-    final List<CheckboxListTile> _weekDays = <CheckboxListTile>[
-      CheckboxListTile(
-        value: _selectedDay["mon"],
-        onChanged: (n) {
-          setState(() {
-            _assignDayVal("mon", n);
-          });
-        },
-        title: Text("Monday"),
-        controlAffinity: ListTileControlAffinity.leading,
-      ),
-      CheckboxListTile(
-        value: _selectedDay["tue"],
-        onChanged: (n) {
-          setState(() {
-            _assignDayVal("tue", n);
-          });
-        },
-        title: Text("Tuesday"),
-        controlAffinity: ListTileControlAffinity.leading,
-      ),
-      CheckboxListTile(
-        value: _selectedDay["wed"],
-        onChanged: (n) {
-          setState(() {
-            _assignDayVal("wed", n);
-          });
-        },
-        title: Text("Wednesday"),
-        controlAffinity: ListTileControlAffinity.leading,
-      ),
-      CheckboxListTile(
-        value: _selectedDay["thur"],
-        onChanged: (n) {
-          setState(() {
-            _assignDayVal("thur", n);
-          });
-        },
-        title: Text("Thursday"),
-        controlAffinity: ListTileControlAffinity.leading,
-      ),
-      CheckboxListTile(
-        value: _selectedDay["fri"],
-        onChanged: (n) {
-          setState(() {
-            _assignDayVal("fri", n);
-          });
-        },
-        title: Text("Friday"),
-        controlAffinity: ListTileControlAffinity.leading,
-      ),
-      CheckboxListTile(
-        value: _selectedDay["sat"],
-        onChanged: (n) {
-          setState(() {
-            _assignDayVal("sat", n);
-          });
-        },
-        title: Text("Saturday"),
-        controlAffinity: ListTileControlAffinity.leading,
-      ),
-      CheckboxListTile(
-        value: _selectedDay["sun"],
-        onChanged: (n) {
-          setState(() {
-            _assignDayVal("sun", n);
-          });
-        },
-        title: Text("Sunday"),
-        controlAffinity: ListTileControlAffinity.leading,
-      )
-    ];
+    List<CheckboxListTile> _weekDayPickers() {
+      List<CheckboxListTile> pickers = [];
+      _wdMapper.forEach((weekday, isRepeated) {
+        pickers.add(CheckboxListTile(
+          value: isRepeated,
+          onChanged: (bool newVal) {
+            setState(() {
+              _wdMapper[weekday] = newVal;
+            });
+          },
+          title: Text((<String>() {
+            switch (weekday) {
+              case DateTime.monday:
+                return "Monday";
+              case DateTime.tuesday:
+                return "Tuesday";
+              case DateTime.wednesday:
+                return "Wednesday";
+              case DateTime.thursday:
+                return "Thursday";
+              case DateTime.friday:
+                return "Friday";
+              case DateTime.saturday:
+                return "Saturday";
+              case DateTime.sunday:
+                return "Sunday";
+            }
+          })()),
+        ));
+      });
+      return pickers;
+    }
+
     return Scaffold(
       appBar: AppBar(
         actions: [
@@ -363,7 +334,11 @@ class _OTPCalenderEventAdder extends State<OTPCalenderEventAdder> {
                           ));
                 } else {
                   //Insert event handler
-
+                  _courseMaker(_controllers["summary"].text, _currentCarType,
+                          _eventsMap["start"], _eventsMap["end"], _wdMapper)
+                      .then((obj) {
+                    print(jsonEncode(obj));
+                  });
                 }
               },
               child: Text(
@@ -422,14 +397,33 @@ class _OTPCalenderEventAdder extends State<OTPCalenderEventAdder> {
                     });
                   },
                 ),
+                Divider(),
+                Text("Car type"),
+                DropdownButton<String>(
+                  value: _currentCarType,
+                  items: _availableCarTypes
+                      .map<DropdownMenuItem<String>>(
+                          (String carType) => DropdownMenuItem(
+                                child: Text(carType),
+                                value: carType,
+                              ))
+                      .toList(),
+                  onChanged: (String carType) {
+                    setState(() {
+                      _currentCarType = carType;
+                    });
+                  },
+                  isExpanded: true,
+                ),
+                Divider(),
+                Text("On every:"),
+                Container(
+                    width: MediaQuery.of(context).size.width,
+                    height: 200,
+                    child: ListView(children: _weekDayPickers()))
               ],
             ),
           ),
-          Divider(),
-          Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Padding(child: Text("On every:"), padding: EdgeInsets.all(10)),
-            Container(child: Column(children: _weekDays)),
-          ]),
         ]),
       ),
     );

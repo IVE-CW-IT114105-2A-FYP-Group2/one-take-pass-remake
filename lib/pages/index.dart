@@ -87,7 +87,7 @@ class _OTPIndex extends State<OTPIndex> {
           },
           child: Icon(Icons.add),
           mini: false,
-          tooltip: "Add events",
+          tooltip: "Add courses",
         );
       default:
         return null;
@@ -124,9 +124,9 @@ class _OTPIndex extends State<OTPIndex> {
 class UserIdentify extends StatelessWidget {
   static bool _firstTime = true;
   final Widget Function(UserREST) child;
-  UserREST _currentLoginUser;
+  //UserREST _currentLoginUser;
 
-  UserREST get currentLoginUser => _currentLoginUser;
+  //UserREST get currentLoginUser => _currentLoginUser;
 
   UserIdentify({@required this.child});
 
