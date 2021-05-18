@@ -6,6 +6,22 @@ class TimeRange {
   TimeRange({this.startTime, this.endTime});
 
   Map<String, String> get toJson => {"start": startTime, "stop": endTime};
+
+  Map<String, DateTime> get parsedToDateTime {
+    Map<String, DateTime> parsed = {};
+    toJson.forEach((key, value) {
+      var dtSplit = value.split(" ");
+      var dateStr = dtSplit[0].split("-"), timeStr = dtSplit[1].split(":");
+      parsed[key] = DateTime(
+          int.parse(dateStr[0]), //Year
+          int.parse(dateStr[1]), //Month
+          int.parse(dateStr[2]), //Date
+          int.parse(timeStr[0]), //Hour
+          int.parse(timeStr[1]), //Minute
+          int.parse(timeStr[2])); //Second
+    });
+    return parsed;
+  }
 }
 
 ///UNified interface for calendar
@@ -63,4 +79,16 @@ class CoursesCalendar implements ClendarInteraface {
     });
     return CoursesCalendar(json["title"], json["type"], ranges, json["id"]);
   }
+}
+
+class PersonalCourseEvent {
+  final TimeRange range;
+  final String stdPhono, insPhono;
+  PersonalCourseEvent({this.range, this.stdPhono, this.insPhono});
+
+  factory PersonalCourseEvent.fromJson(Map<String, dynamic> json) =>
+      PersonalCourseEvent(
+          range: TimeRange(startTime: json["start"], endTime: json["stop"]),
+          stdPhono: json["student"],
+          insPhono: json["holder"]);
 }

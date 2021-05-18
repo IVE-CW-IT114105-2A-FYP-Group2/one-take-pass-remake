@@ -17,6 +17,18 @@ import 'package:one_take_pass_remake/themes.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class OTPCalender extends StatefulWidget {
+  Future<List<PersonalCourseEvent>> get allEvents async {
+    List<PersonalCourseEvent> e = [];
+    var dio = Dio();
+    dio.options.headers["Content-Type"] = "application/json";
+    var resp = await dio.post(APISitemap.calendar.toString(),
+        data: {"refresh_token": (await UserTokenLocalStorage.getToken())});
+    (resp.data as List<dynamic>).forEach((element) {
+      e.add(PersonalCourseEvent.fromJson(element));
+    });
+    return e;
+  }
+
   @override
   State<StatefulWidget> createState() => _OTPCalender();
 }
@@ -28,7 +40,7 @@ class _OTPCalender extends State<OTPCalender> with RouteAware {
   //Defile current calender display format
   CalendarFormat _format = CalendarFormat.month;
 
-  //List<Event> _pickedEvent = [];
+  List<PersonalCourseEvent> _pickedEvent = [];
 
   @override
   void initState() {
@@ -52,8 +64,19 @@ class _OTPCalender extends State<OTPCalender> with RouteAware {
     setState(() {});
   }
 
+  List<PersonalCourseEvent> eventGetterByDay(
+      List<PersonalCourseEvent> allE, DateTime selected) {
+    return allE.where((pce) {
+      var holdTime = pce.range.parsedToDateTime["start"];
+      return (holdTime.year == selected.year &&
+          holdTime.month == selected.month &&
+          holdTime.day == selected.day);
+    }).toList();
+  }
+
   ///All interface about calendar
-  Widget calendarInterface(BuildContext context, List<dynamic> receivedEvents) {
+  Widget calendarInterface(
+      BuildContext context, List<PersonalCourseEvent> receivedEvents) {
     return StatefulBuilder(
         builder: (context, setInnerState) => Column(children: [
               TableCalendar(
@@ -79,7 +102,7 @@ class _OTPCalender extends State<OTPCalender> with RouteAware {
                   setInnerState(() {
                     _selectedDate = selected;
                     _focusedDate = focused;
-                    //_pickedEvent = eventGetterByDay(selected);
+                    _pickedEvent = eventGetterByDay(receivedEvents, selected);
                   });
                 },
                 calendarFormat: _format,
@@ -92,13 +115,13 @@ class _OTPCalender extends State<OTPCalender> with RouteAware {
                   });
                 },
                 eventLoader: (dt) {
-                  return []; //eventGetterByDay(dt);
+                  return eventGetterByDay(receivedEvents, dt);
                 },
               ),
               Expanded(
                 child: ListView.builder(
                     padding: EdgeInsets.all(5),
-                    itemCount: 3, //_pickedEvent.length,
+                    itemCount: _pickedEvent.length,
                     itemBuilder: (context, count) => GestureDetector(
                         onTap: () async {
                           //When click the event, open in google calendar
@@ -114,29 +137,30 @@ class _OTPCalender extends State<OTPCalender> with RouteAware {
                           decoration: BoxDecoration(
                               border: Border.all(
                                   color: OTPColour.mainTheme, width: 1.5)),
-                          /*child: Column(
+                          child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
                                 (DateFormat("MMMM d").format(_pickedEvent[count]
-                                            .start
-                                            .date ??
-                                        _pickedEvent[count].start.dateTime) +
+                                        .range
+                                        .parsedToDateTime["start"]) +
                                     "\t\t\t\t" +
-                                    _timeDisplayHandler(
-                                        _pickedEvent[count].start.dateTime) +
+                                    DateFormat.Hm().format(_pickedEvent[count]
+                                        .range
+                                        .parsedToDateTime["start"]) +
                                     " - " +
-                                    _timeDisplayHandler(
-                                        _pickedEvent[count].end.dateTime)),
+                                    DateFormat.Hm().format(_pickedEvent[count]
+                                        .range
+                                        .parsedToDateTime["end"])),
                                 style: TextStyle(
                                     fontSize: 18, fontWeight: FontWeight.w300),
                               ),
                               Text(
-                                _pickedEvent[count].summary,
+                                "Course",
                                 style: TextStyle(fontSize: 16),
                               ),
                             ],
-                          ),*/
+                          ),
                         ))),
               )
             ]));
@@ -144,7 +168,7 @@ class _OTPCalender extends State<OTPCalender> with RouteAware {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<dynamic>>(
+    return FutureBuilder<List<PersonalCourseEvent>>(
         future: Future.delayed(Duration(seconds: 1), () => []),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -224,7 +248,7 @@ class _OTPCalenderEventAdder extends State<OTPCalenderEventAdder> {
     TimeRange _dtToRESTJsonFactory(DateTime start, DateTime end) {
       String exporter(DateTime dt) {
         // Default uses en_US which SWAPPED POSITION OF MONTH AND DATE
-        String date = DateFormat.yMd('en_GB').format(dt).replaceAll("/", "-");
+        String date = DateFormat("yyyy-MM-dd").format(dt).replaceAll("/", "-");
         String time = DateFormat.Hm('en_GB').format(dt) + ":00";
         return date + " " + time;
       }
