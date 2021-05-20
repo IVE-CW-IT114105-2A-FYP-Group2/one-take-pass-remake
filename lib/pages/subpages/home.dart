@@ -222,61 +222,22 @@ class _IncomingRequestUI extends State<_IncomingRequest> {
                   Expanded(
                       child: ListView.builder(
                           itemCount: snapshot.data.length,
-                          itemBuilder: (context, count) => Container(
-                              height: 75,
-                              child: GestureDetector(
-                                  onTap: () {},
-                                  onLongPress: () async {
-                                    await showDialog(
-                                        context: context,
-                                        builder: (context) => SimpleDialog(
-                                              title: Text("Quick Action"),
-                                              children: [
-                                                TextButton(
-                                                    onPressed: () {},
-                                                    style: ButtonStyle(
-                                                        alignment: Alignment
-                                                            .centerLeft),
-                                                    child: Padding(
-                                                        child: Text(
-                                                            "View detail",
-                                                            textAlign:
-                                                                TextAlign.start,
-                                                            style: TextStyle(
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold)),
-                                                        padding:
-                                                            EdgeInsets.only(
-                                                                left: 20))),
-                                                Divider(),
-                                                TextButton(
-                                                    style: ButtonStyle(
-                                                        alignment: Alignment
-                                                            .centerLeft),
-                                                    onPressed: () {},
-                                                    child: Padding(
-                                                      child: Text("Approve",
-                                                          textAlign:
-                                                              TextAlign.start),
-                                                      padding: EdgeInsets.only(
-                                                          left: 20),
-                                                    )),
-                                                TextButton(
-                                                    style: ButtonStyle(
-                                                        alignment: Alignment
-                                                            .centerLeft),
-                                                    onPressed: () {},
-                                                    child: Padding(
-                                                        child: Text("Reject",
-                                                            textAlign: TextAlign
-                                                                .start),
-                                                        padding:
-                                                            EdgeInsets.only(
-                                                                left: 20))),
-                                              ],
-                                            ));
-                                  },
+                          itemBuilder: (context, count) => GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => _CourseDetail(
+                                            courses: snapshot.data[count])));
+                              },
+                              child: Container(
+                                  alignment: Alignment.centerLeft,
+                                  height: 80,
+                                  width: MediaQuery.of(context).size.width,
+                                  decoration:
+                                      BoxDecoration(color: OTPColour.light2),
+                                  margin: EdgeInsets.all(2.5),
+                                  padding: EdgeInsets.all(5),
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     crossAxisAlignment:
@@ -339,6 +300,115 @@ class _IncomingRequestUI extends State<_IncomingRequest> {
           }
         }
       },
+    );
+  }
+}
+
+class _CourseDetail extends StatelessWidget {
+  ///Contain courses
+  final CoursesCalendar courses;
+
+  _CourseDetail({@required this.courses});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Request detail"),
+        centerTitle: true,
+      ),
+      body: Container(
+        width: MediaQuery.of(context).size.width,
+        height: MediaQuery.of(context).size.height,
+        margin: EdgeInsets.all(5),
+        child: Column(
+          children: [
+            Expanded(
+                child: ListView(
+              children: [
+                Text(
+                  "Course title",
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.w700),
+                ),
+                Text(courses.title, style: TextStyle(fontSize: 18)),
+                Divider(indent: 5),
+                Text(
+                  "Vehicle type",
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.w700),
+                ),
+                Text(courses.vehicleType, style: TextStyle(fontSize: 18)),
+                Divider(indent: 5),
+                Text(
+                  "Timetable",
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.w700),
+                ),
+                Container(
+                  width: MediaQuery.of(context).size.width,
+                  height: 300,
+                  child: ListView.builder(
+                      itemCount: courses.courseTime.length,
+                      itemBuilder: (context, count) {
+                        var dtObj = courses.courseTime[count].parsedToDateTime;
+                        String getDate(DateTime dt) {
+                          return dt.year.toString() +
+                              "-" +
+                              dt.month.toString() +
+                              "-" +
+                              dt.day.toString();
+                        }
+
+                        String getTime(DateTime dt) {
+                          return ((dt.hour < 10) ? "0" : "") +
+                              dt.hour.toString() +
+                              ":" +
+                              ((dt.minute < 10) ? "0" : "") +
+                              dt.minute.toString();
+                        }
+
+                        return Container(
+                          width: MediaQuery.of(context).size.width,
+                          height: 50,
+                          alignment: Alignment.center,
+                          margin: EdgeInsets.all(5),
+                          decoration: BoxDecoration(
+                              border:
+                                  Border.all(width: 2, color: OTPColour.dark1)),
+                          child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Text(
+                                  "Date: " + getDate(dtObj["start"]),
+                                  style: TextStyle(fontSize: 16),
+                                ),
+                                Padding(
+                                    padding:
+                                        EdgeInsets.only(left: 10, right: 10)),
+                                Text(
+                                  "Time: " +
+                                      getTime(dtObj["start"]) +
+                                      " - " +
+                                      getTime(dtObj["stop"]),
+                                  style: TextStyle(fontSize: 16),
+                                )
+                              ]),
+                        );
+                      }),
+                )
+              ],
+            )),
+            Container(
+                width: MediaQuery.of(context).size.width,
+                height: 40,
+                margin: EdgeInsets.all(5),
+                child: MaterialButton(
+                  color: OTPColour.light2,
+                  child: Text("Accept this course request"),
+                  onPressed: () {},
+                ))
+          ],
+        ),
+      ),
     );
   }
 }
