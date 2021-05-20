@@ -31,10 +31,10 @@ class ChatComm extends StatefulWidget {
                 "userPhoneNumber": pickedRESTResult["userPhoneNumber"]
               }))
           .then((resp) {
-        if (!chatLog.isClosed) {
+        if (!chatLog.isClosed && resp.data != null) {
           chatLog.sink.add(resp.data);
         }
-      });
+      }).onError((error, stackTrace) {});
     });
   }
 

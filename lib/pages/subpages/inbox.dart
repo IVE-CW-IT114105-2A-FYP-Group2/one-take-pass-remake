@@ -22,13 +22,15 @@ class OTPInbox extends StatefulWidget with IdentityWidget {
     var dio = Dio();
     dio.options.headers["Content-Type"] = "application/json";
     t = Timer.periodic(Duration(seconds: 1), (timer) async {
-      var resp = await dio.post(
-          APISitemap.chatControl("get_contact").toString(),
-          data: jsonEncode(
-              {"refresh_token": (await UserTokenLocalStorage.getToken())}));
-      if (!contactStream.isClosed) {
-        contactStream.sink.add(resp.data);
-      }
+      dio
+          .post(APISitemap.chatControl("get_contact").toString(),
+              data: jsonEncode(
+                  {"refresh_token": (await UserTokenLocalStorage.getToken())}))
+          .then((resp) {
+        if (!contactStream.isClosed && resp.data != null) {
+          contactStream.sink.add(resp.data);
+        }
+      }).onError((error, stackTrace) {});
     });
   }
 
