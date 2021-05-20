@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
@@ -10,18 +11,25 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 final String contentKey = "otp_chat_name";
 
-Future<List<dynamic>> get currentContent async {
-  var dio = Dio();
-  dio.options.headers["Content-Type"] = "application/json";
-  var resp = await dio.post(APISitemap.chatControl("get_contact").toString(),
-      data: jsonEncode(
-          {"refresh_token": (await UserTokenLocalStorage.getToken())}));
-  return resp.data;
-}
-
 class OTPInbox extends StatefulWidget with IdentityWidget {
+  Timer t;
+
+  StreamController<List<dynamic>> contactStream =
+      StreamController<List<dynamic>>();
+
   OTPInbox(UserREST rest) {
     this.currentIdentity = rest;
+    var dio = Dio();
+    dio.options.headers["Content-Type"] = "application/json";
+    t = Timer.periodic(Duration(seconds: 1), (timer) async {
+      var resp = await dio.post(
+          APISitemap.chatControl("get_contact").toString(),
+          data: jsonEncode(
+              {"refresh_token": (await UserTokenLocalStorage.getToken())}));
+      if (!contactStream.isClosed) {
+        contactStream.sink.add(resp.data);
+      }
+    });
   }
 
   @override
@@ -32,9 +40,16 @@ class OTPInbox extends StatefulWidget with IdentityWidget {
 
 class _OTPInbox extends State<OTPInbox> {
   @override
+  void dispose() {
+    widget.t.cancel();
+    widget.contactStream.close();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<dynamic>>(
-        future: currentContent,
+    return StreamBuilder<List<dynamic>>(
+        stream: widget.contactStream.stream,
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             return ListView.builder(

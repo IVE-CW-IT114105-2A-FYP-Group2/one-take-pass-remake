@@ -21,9 +21,9 @@ class ChatComm extends StatefulWidget {
 
   ChatComm({@required this.pickedRESTResult, @required this.isStudent}) {
     chatLog = StreamController<List<dynamic>>();
+    var dio = Dio();
+    dio.options.headers["Content-Type"] = "application/json";
     t = Timer.periodic(Duration(milliseconds: 500), (_) async {
-      var dio = Dio();
-      dio.options.headers["Content-Type"] = "application/json";
       dio
           .post(APISitemap.chatControl("get_msg").toString(),
               data: jsonEncode({
@@ -31,7 +31,9 @@ class ChatComm extends StatefulWidget {
                 "userPhoneNumber": pickedRESTResult["userPhoneNumber"]
               }))
           .then((resp) {
-        chatLog.sink.add(resp.data);
+        if (!chatLog.isClosed) {
+          chatLog.sink.add(resp.data);
+        }
       });
     });
   }
@@ -68,11 +70,8 @@ class _ChatComm extends State<ChatComm> {
   void dispose() {
     _controller.dispose();
     widget.t.cancel();
-    try {
-      widget.chatLog.close();
-    } finally {
-      super.dispose();
-    }
+    widget.chatLog.close();
+    super.dispose();
   }
 
   @override
