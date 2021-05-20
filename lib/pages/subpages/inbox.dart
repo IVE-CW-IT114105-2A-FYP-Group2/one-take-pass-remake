@@ -58,7 +58,8 @@ class _OTPInbox extends State<OTPInbox> {
                           context,
                           MaterialPageRoute(
                               builder: (context) => ChatComm(
-                                  pickedRESTResult: snapshot.data[count])));
+                                  pickedRESTResult: snapshot.data[count],
+                                  isStudent: widget.isStudent)));
                     }));
           } else {
             return Center(

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
+import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 import 'package:one_take_pass_remake/api/url/localapiurl.dart';
 import 'package:one_take_pass_remake/api/userdata/login_request.dart';
@@ -12,11 +13,13 @@ class ChatComm extends StatefulWidget {
   //final wschat = IOWebSocketChannel.connect('ws://localhost:443');
   final Map<String, dynamic> pickedRESTResult;
 
+  final bool isStudent;
+
   Timer t;
 
   StreamController<List<dynamic>> chatLog;
 
-  ChatComm({@required this.pickedRESTResult}) {
+  ChatComm({@required this.pickedRESTResult, @required this.isStudent}) {
     chatLog = StreamController<List<dynamic>>();
     t = Timer.periodic(Duration(milliseconds: 500), (_) async {
       var dio = Dio();
@@ -75,6 +78,34 @@ class _ChatComm extends State<ChatComm> {
         appBar: AppBar(
           title: Text(widget.pickedRESTResult["name"]),
           centerTitle: true,
+          actions: [
+            TextButton.icon(
+                onPressed: () {
+                  showDialog(
+                      context: context,
+                      builder: (context) => SimpleDialog(
+                            children: [
+                              TextButton(
+                                  onPressed: () {},
+                                  child: Text(
+                                    "Make appointment",
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        color: OTPColour.dark1,
+                                        fontWeight: FontWeight.w700),
+                                  ))
+                            ],
+                          ));
+                },
+                icon: Icon(
+                  CupertinoIcons.list_bullet,
+                  color: OTPColour.dark1,
+                ),
+                label: Text(
+                  "Action",
+                  style: TextStyle(color: OTPColour.dark2),
+                ))
+          ],
         ),
         body: StatefulBuilder(builder: (context, sentState) {
           return Stack(

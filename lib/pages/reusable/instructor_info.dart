@@ -110,6 +110,7 @@ class InstructorInfo extends StatelessWidget {
                                 "name": instructor.name,
                                 "userPhoneNumber": instructor.userPhoneNumber
                               },
+                              isStudent: true,
                             )));
               },
               child: Text("Open chat"),
