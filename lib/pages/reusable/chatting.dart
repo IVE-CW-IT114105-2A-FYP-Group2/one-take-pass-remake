@@ -14,10 +14,10 @@ class ChatComm extends StatefulWidget {
 
   Timer t;
 
-  StreamController<List<Map<String, dynamic>>> chatLog;
+  StreamController<List<dynamic>> chatLog;
 
   ChatComm({@required this.pickedRESTResult}) {
-    chatLog = StreamController<List<Map<String, dynamic>>>();
+    chatLog = StreamController<List<dynamic>>();
     t = Timer.periodic(Duration(milliseconds: 500), (_) async {
       var dio = Dio();
       dio.options.headers["Content-Type"] = "application/json";
@@ -33,9 +33,13 @@ class ChatComm extends StatefulWidget {
     });
   }
 
-  void sendMsg(String msg, String to) {
+  void sendMsg(String msg) {
     UserTokenLocalStorage.getToken().then((token) {
-      var sendREST = {"refresh_token": token, "msg": msg, "to": to};
+      var sendREST = {
+        "refresh_token": token,
+        "msg": msg,
+        "to": pickedRESTResult["userPhoneNumber"]
+      };
       var dio = Dio();
       dio.options.headers["Content-Type"] = "application/json";
       dio.post(APISitemap.chatControl("send_msg").toString(),
@@ -87,6 +91,8 @@ class _ChatComm extends State<ChatComm> {
                               itemBuilder: (context, msgpos) =>
                                   _ChatElements._getMsgBox(
                                       msgobj.data[msgpos]));
+                        } else {
+                          return Container();
                         }
                       })),
               /*ListView.builder(
@@ -116,6 +122,7 @@ class _ChatComm extends State<ChatComm> {
                               child: Text("Send"),
                               onPressed: () {
                                 if (_controller.text.isNotEmpty) {
+                                  widget.sendMsg(_controller.text);
                                   sentState(() {
                                     _controller.clear();
                                   });
