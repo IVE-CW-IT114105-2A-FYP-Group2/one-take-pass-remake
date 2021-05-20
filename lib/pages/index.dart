@@ -88,7 +88,7 @@ class _OTPIndex extends State<OTPIndex> {
               MaterialPageRoute(builder: (context) => OTPListExistedCourses()));
         }
         return FloatingActionButton(
-          onPressed: () {},
+          onPressed: null,
           child: GestureDetector(
             onTap: () {
               addCoursesPage();
