@@ -68,8 +68,11 @@ class _ChatComm extends State<ChatComm> {
   void dispose() {
     _controller.dispose();
     widget.t.cancel();
-    widget.chatLog.close();
-    super.dispose();
+    try {
+      widget.chatLog.close();
+    } finally {
+      super.dispose();
+    }
   }
 
   @override
