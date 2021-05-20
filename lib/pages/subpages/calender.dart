@@ -575,7 +575,7 @@ class _OTPListExistedCourses extends State<OTPListExistedCourses> {
                         CupertinoIcons.xmark_circle,
                         size: 120,
                       ),
-                      Text("Unbale to get your courses detail")
+                      Text("Unable to get your courses detail")
                     ],
                   ),
                 );
