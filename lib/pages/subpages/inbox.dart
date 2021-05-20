@@ -9,7 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 final String contentKey = "otp_chat_name";
 
-Future<List<Map<String, dynamic>>> get currentContent async {
+Future<List<dynamic>> get currentContent async {
   var dio = Dio();
   dio.options.headers["Content-Type"] = "application/json";
   var resp = await dio.post(APISitemap.chatControl("get_contact").toString(),
@@ -26,7 +26,7 @@ class OTPInbox extends StatefulWidget {
 class _OTPInbox extends State<OTPInbox> {
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<Map<String, dynamic>>>(
+    return FutureBuilder<List<dynamic>>(
         future: currentContent,
         builder: (context, snapshot) {
           if (snapshot.hasData) {
