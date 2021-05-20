@@ -1,5 +1,10 @@
+import 'dart:convert';
+
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
+import 'package:one_take_pass_remake/api/calendar/calendar.dart';
+import 'package:one_take_pass_remake/api/url/localapiurl.dart';
 import 'package:one_take_pass_remake/api/userdata/login_request.dart';
 import 'package:one_take_pass_remake/api/userdata/users.dart';
 import 'package:one_take_pass_remake/pages/reusable/chatting.dart';
@@ -121,13 +126,174 @@ class InstructorInfo extends StatelessWidget {
             width: MediaQuery.of(context).size.width,
             child: MaterialButton(
               color: OTPColour.light1,
-              onPressed: () async {
+              onPressed: () {
                 //Nothing now
               },
-              child: Text("Apply courses"),
+              child: Text("Make appointment"),
             ),
           )
         ],
+      ),
+    );
+  }
+}
+
+class CourseList extends StatefulWidget {
+  final String phoneNo;
+
+  CourseList({@required this.phoneNo});
+
+  Future<List<CoursesCalendar>> get coursesList async {
+    List<CoursesCalendar> buffer = [];
+    var dio = Dio();
+    dio.options.headers["Content-Type"] = "application/json";
+    var resp = await dio.post(APISitemap.courseControl("get").toString(),
+        data: jsonEncode({
+          "refresh_token": (await UserTokenLocalStorage.getToken()),
+          "phoneno": phoneNo
+        }));
+    (resp.data as List<dynamic>).forEach((jsonObj) {
+      buffer.add(CoursesCalendar.fromJson(jsonObj));
+    });
+    return buffer;
+  }
+
+  void applyCourses(CoursesCalendar courses) async {
+    var dio = Dio();
+    dio.options.headers["Content-Type"] = "application/json";
+    await dio.post(APISitemap.courseControl("join").toString(),
+        data: jsonEncode({
+          "refresh_token": (await UserTokenLocalStorage.getToken()),
+          "id": courses.id
+        }));
+  }
+
+  @override
+  State<StatefulWidget> createState() => _CourseList();
+}
+
+class _CourseList extends State<CourseList> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Available courses"),
+        centerTitle: true,
+      ),
+      body: FutureBuilder<List<CoursesCalendar>>(
+        future: widget.coursesList,
+        builder: (context, result) {
+          if (result.connectionState == ConnectionState.waiting) {
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          } else {
+            if (result.hasData) {
+              return ListView.builder(
+                  itemCount: result.data.length,
+                  itemBuilder: (context, count) => Container(
+                        width: MediaQuery.of(context).size.width,
+                        height: 250,
+                        margin: EdgeInsets.all(10),
+                        padding: EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                            border:
+                                Border.all(width: 5, color: OTPColour.dark1)),
+                        child: Stack(
+                          alignment: Alignment.centerLeft,
+                          children: [
+                            Text(
+                              result.data[count].title,
+                              style: TextStyle(fontSize: 24),
+                            ),
+                            Text("Type: " + result.data[count].vehicleType),
+                            Positioned(
+                              child: MaterialButton(
+                                child: Text("Show timetable and apply"),
+                                onPressed: () {
+                                  showDialog(
+                                      context: context,
+                                      builder: (context) => AlertDialog(
+                                            title: Text("Course timetable:"),
+                                            content: Container(
+                                              margin: EdgeInsets.all(5),
+                                              width: MediaQuery.of(context)
+                                                  .size
+                                                  .width,
+                                              height: 300,
+                                              child: ListView.builder(
+                                                  itemCount: result.data[count]
+                                                      .courseTime.length,
+                                                  itemBuilder: (context,
+                                                          timeCount) =>
+                                                      Container(
+                                                        margin: EdgeInsets.only(
+                                                            top: 5, bottom: 5),
+                                                        width: MediaQuery.of(
+                                                                context)
+                                                            .size
+                                                            .width,
+                                                        height: 100,
+                                                        child: Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            Text("From: " +
+                                                                result
+                                                                    .data[count]
+                                                                    .courseTime[
+                                                                        timeCount]
+                                                                    .startTime),
+                                                            Text("To: " +
+                                                                result
+                                                                    .data[count]
+                                                                    .courseTime[
+                                                                        timeCount]
+                                                                    .endTime),
+                                                          ],
+                                                        ),
+                                                      )),
+                                            ),
+                                            actions: [
+                                              TextButton(
+                                                  onPressed: () {
+                                                    Navigator.pop(context);
+                                                  },
+                                                  child: Text(
+                                                    "Cancel",
+                                                    style: TextStyle(
+                                                        color: Colors.red),
+                                                  )),
+                                              TextButton(
+                                                  onPressed: () {},
+                                                  child: Text(
+                                                    "Join",
+                                                    style: TextStyle(
+                                                        color: OTPColour.dark1),
+                                                  ))
+                                            ],
+                                          ));
+                                },
+                              ),
+                              bottom: 5,
+                              right: 5,
+                            )
+                          ],
+                        ),
+                      ));
+            } else {
+              return Center(
+                  child: Column(children: [
+                Icon(
+                  CupertinoIcons.xmark_circle,
+                  size: 120,
+                ),
+                Text("Unable to load instructor's courses")
+              ]));
+            }
+          }
+        },
       ),
     );
   }

@@ -1,10 +1,13 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
+import 'package:one_take_pass_remake/api/calendar/calendar.dart';
 import 'package:one_take_pass_remake/api/misc.dart';
 import 'package:one_take_pass_remake/api/url/localapiurl.dart';
 import 'package:one_take_pass_remake/api/userdata/login_request.dart'
-    show UserREST;
+    show UserREST, UserTokenLocalStorage;
 import 'package:one_take_pass_remake/pages/reusable/indentity_widget.dart';
 import 'package:one_take_pass_remake/pages/reusable/instructor_info.dart';
 import 'package:one_take_pass_remake/themes.dart';
@@ -175,6 +178,19 @@ class _SearchList extends StatelessWidget {
 
 ///Instructor exclusive page for accepting or rejecting student to attnd the courses
 class _IncomingRequest extends StatefulWidget {
+  Future<List<CoursesCalendar>> get orderedCourses async {
+    List<CoursesCalendar> buffer = [];
+    var dio = Dio();
+    dio.options.headers["Content-Type"] = "application/json";
+    var resp = await dio.post(APISitemap.courseControl("order").toString(),
+        data: jsonEncode(
+            {"refresh_token": (await UserTokenLocalStorage.getToken())}));
+    (resp.data as List<dynamic>).forEach((jsonObj) {
+      buffer.add(CoursesCalendar.fromJson(jsonObj));
+    });
+    return buffer;
+  }
+
   @override
   State<StatefulWidget> createState() => _IncomingRequestUI();
 }
@@ -182,9 +198,8 @@ class _IncomingRequest extends StatefulWidget {
 class _IncomingRequestUI extends State<_IncomingRequest> {
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<OTPUsers>>(
-      future: Future.delayed(
-          Duration(seconds: 1), () => [OTPUsers("Foo"), OTPUsers("Bar")]),
+    return FutureBuilder<List<CoursesCalendar>>(
+      future: widget.orderedCourses,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(
@@ -268,11 +283,17 @@ class _IncomingRequestUI extends State<_IncomingRequest> {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        snapshot.data[count].name,
+                                        snapshot.data[count].title,
                                         style: TextStyle(fontSize: 18),
                                       ),
                                       Text("Durations:"),
-                                      Text("2021-01-01 - 2021-05-01")
+                                      Text((<String>() {
+                                        var start = snapshot.data[count]
+                                                .courseTime.first.startTime,
+                                            end = snapshot.data[count]
+                                                .courseTime.last.endTime;
+                                        return start + " - " + end;
+                                      }()))
                                     ],
                                   ))))),
                   Container(
@@ -309,6 +330,7 @@ class _IncomingRequestUI extends State<_IncomingRequest> {
                         onPressed: () {
                           setState(() {});
                         },
+                        color: OTPColour.light2,
                         child: Text("Reload"),
                       ))
                 ],
