@@ -24,8 +24,9 @@ class APISitemap {
   static Uri courseControl(String action) {
     switch (action.toLowerCase()) {
       case "add":
-      case "get":
         return Uri.https(_apiUrl, 'course/avaliable');
+      case "get":
+        return Uri.https(_apiUrl, 'course/get');
       case "delete":
         return Uri.https(_apiUrl, 'course/manage');
       case "join":

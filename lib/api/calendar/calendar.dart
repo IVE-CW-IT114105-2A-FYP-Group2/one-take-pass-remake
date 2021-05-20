@@ -69,8 +69,12 @@ class CoursesCalendar implements ClendarInteraface {
   }
 
   @override
-  Map<String, dynamic> get toJson =>
-      {"title": _title, "type": _vehicleType, "course_time": _courseDateList};
+  Map<String, dynamic> get toJson => {
+        "id": _id,
+        "title": _title,
+        "type": _vehicleType,
+        "course_time": _courseDateList
+      };
 
   factory CoursesCalendar.fromJson(Map<String, dynamic> json) {
     List<TimeRange> ranges = [];

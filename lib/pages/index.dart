@@ -83,6 +83,10 @@ class _OTPIndex extends State<OTPIndex> {
           Navigator.push(context,
               MaterialPageRoute(builder: (context) => OTPCalenderEventAdder()));
         }
+        void listCoursePage() {
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => OTPListExistedCourses()));
+        }
         return FloatingActionButton(
           onPressed: () {},
           child: GestureDetector(
@@ -104,7 +108,10 @@ class _OTPIndex extends State<OTPIndex> {
                                 style: TextStyle(fontWeight: FontWeight.w700),
                               )),
                           TextButton(
-                              onPressed: () {}, child: Text("View courses"))
+                              onPressed: () {
+                                listCoursePage();
+                              },
+                              child: Text("View courses"))
                         ],
                       ));
             },

@@ -515,6 +515,14 @@ class OTPListExistedCourses extends StatefulWidget {
   Future<List<CoursesCalendar>> get ownerCourses async {
     List<CoursesCalendar> buffer = [];
     var dio = Dio();
+    dio.options.headers["Content-Type"] = "application/json";
+    var resp = await dio.post(APISitemap.courseControl("get").toString(),
+        data: jsonEncode(
+            {"refresh_token": (await UserTokenLocalStorage.getToken())}));
+    (resp.data as List<dynamic>).forEach((jsonObj) {
+      buffer.add(CoursesCalendar.fromJson(jsonObj));
+    });
+    return buffer;
   }
 
   @override
@@ -524,8 +532,56 @@ class OTPListExistedCourses extends StatefulWidget {
 class _OTPListExistedCourses extends State<OTPListExistedCourses> {
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<CoursesCalendar>>(builder: (context, snapshot) {
-      return null;
-    });
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Your owned courses"),
+        centerTitle: true,
+      ),
+      body: FutureBuilder<List<CoursesCalendar>>(
+          future: widget.ownerCourses,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(
+                child: CircularProgressIndicator(),
+              );
+            } else {
+              if (snapshot.hasData) {
+                return ListView.builder(
+                    itemCount: snapshot.data.length,
+                    itemBuilder: (context, count) => Container(
+                          margin: EdgeInsets.all(10),
+                          width: MediaQuery.of(context).size.width,
+                          height: 200,
+                          child: Padding(
+                            padding: EdgeInsets.all(10),
+                            child: Stack(
+                              children: [
+                                Text(
+                                  snapshot.data[count].title,
+                                  style: TextStyle(
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.w700),
+                                ),
+                                Text("Type:" + snapshot.data[count].vehicleType)
+                              ],
+                            ),
+                          ),
+                        ));
+              } else {
+                return Center(
+                  child: Column(
+                    children: [
+                      Icon(
+                        CupertinoIcons.xmark_circle,
+                        size: 120,
+                      ),
+                      Text("Unbale to get your courses detail")
+                    ],
+                  ),
+                );
+              }
+            }
+          }),
+    );
   }
 }
