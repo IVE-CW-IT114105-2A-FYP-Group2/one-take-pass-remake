@@ -48,7 +48,7 @@ _PageMap _pmap(UserREST cur) => _PageMap(pageOpt: [
       _PageOpt(
           bnb: BottomNavigationBarItem(
               icon: Icon(CupertinoIcons.envelope), label: "Inbox"),
-          opts: OTPInbox()),
+          opts: OTPInbox(cur)),
       _PageOpt(
           bnb: BottomNavigationBarItem(
               icon: Icon(CupertinoIcons.book), label: "E-Learning"),

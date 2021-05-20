@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:one_take_pass_remake/api/url/localapiurl.dart';
 import 'package:one_take_pass_remake/api/userdata/login_request.dart';
 import 'package:one_take_pass_remake/pages/reusable/chatting.dart';
+import 'package:one_take_pass_remake/pages/reusable/indentity_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 final String contentKey = "otp_chat_name";
@@ -18,9 +19,15 @@ Future<List<dynamic>> get currentContent async {
   return resp.data;
 }
 
-class OTPInbox extends StatefulWidget {
+class OTPInbox extends StatefulWidget with IdentityWidget {
+  OTPInbox(UserREST rest) {
+    this.currentIdentity = rest;
+  }
+
   @override
   State<StatefulWidget> createState() => _OTPInbox();
+
+  bool get isStudent => roleName == "student";
 }
 
 class _OTPInbox extends State<OTPInbox> {
@@ -59,8 +66,10 @@ class _OTPInbox extends State<OTPInbox> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Text(
-                      "Instructors will be appeared when you found and started chatting")
+                  Text(widget.isStudent
+                      ? "Instructors"
+                      : "Students" +
+                          " will be appeared when you found and started chatting")
                 ],
               ),
             );
