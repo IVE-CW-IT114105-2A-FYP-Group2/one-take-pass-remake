@@ -107,6 +107,7 @@ class InstructorInfo extends StatelessWidget {
                         builder: (context) => ChatComm(
                               pickedRESTResult: {
                                 "refresh_token": token,
+                                "name": instructor.name,
                                 "userPhoneNumber": instructor.userPhoneNumber
                               },
                             )));

@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:one_take_pass_remake/api/url/localapiurl.dart';
 import 'package:one_take_pass_remake/api/userdata/gender.dart';
 import 'package:one_take_pass_remake/api/userdata/login_request.dart';
@@ -156,7 +157,7 @@ class EditProfile extends StatefulWidget {
 class _EditProfile extends State<EditProfile> {
   String _recentUsername;
   TextEditingController _nameController;
-  Map<String, TextEditingController> _npwdInputCtrl;
+  Map<String, TextEditingController> _npwdInputCtrl, _phoneCtrl;
 
   @override
   void initState() {
@@ -166,12 +167,19 @@ class _EditProfile extends State<EditProfile> {
       "password": TextEditingController(),
       "confirm": TextEditingController()
     };
+    _phoneCtrl = {
+      "oldNum": TextEditingController(),
+      "newNum": TextEditingController()
+    };
   }
 
   @override
   void dispose() {
     _nameController.dispose();
     _npwdInputCtrl.forEach((_, value) {
+      value.dispose();
+    });
+    _phoneCtrl.forEach((_, value) {
       value.dispose();
     });
     super.dispose();
@@ -212,6 +220,47 @@ class _EditProfile extends State<EditProfile> {
             enableSuggestions: false,
             autocorrect: false,
           ),
+          Container(
+              width: MediaQuery.of(context).size.width,
+              height: 120,
+              child: MaterialButton(
+                child: Text("Change phone number request"),
+                onPressed: () {
+                  showDialog(
+                      context: context,
+                      builder: (context) => SimpleDialog(
+                            title: Text("Change phone number request"),
+                            children: [
+                              Padding(
+                                  padding: EdgeInsets.only(left: 10, right: 10),
+                                  child: Text(
+                                      "Please provide old phone number and the new number will be used for login, our customer service will handle your request as soon as possible.")),
+                              Padding(
+                                padding: EdgeInsets.all(10),
+                                child: TextField(
+                                  controller: _npwdInputCtrl["oldNum"],
+                                  decoration: InputDecoration(
+                                      hintText: "Old phone number"),
+                                  inputFormatters: [
+                                    FilteringTextInputFormatter.digitsOnly
+                                  ],
+                                ),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.all(10),
+                                child: TextField(
+                                  controller: _npwdInputCtrl["newNum"],
+                                  decoration: InputDecoration(
+                                      hintText: "New phone number"),
+                                  inputFormatters: [
+                                    FilteringTextInputFormatter.digitsOnly
+                                  ],
+                                ),
+                              )
+                            ],
+                          ));
+                },
+              ))
           /*
           Container(
             margin: EdgeInsets.only(top: 100),
