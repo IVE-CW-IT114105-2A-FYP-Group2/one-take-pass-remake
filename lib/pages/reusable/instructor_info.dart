@@ -128,8 +128,13 @@ class InstructorInfo extends StatelessWidget {
               color: OTPColour.light1,
               onPressed: () {
                 //Nothing now
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            CourseList(phoneNo: instructor.userPhoneNumber)));
               },
-              child: Text("Make appointment"),
+              child: Text("Get course"),
             ),
           )
         ],
@@ -143,8 +148,8 @@ class CourseList extends StatefulWidget {
 
   CourseList({@required this.phoneNo});
 
-  Future<List<CoursesCalendar>> get coursesList async {
-    List<CoursesCalendar> buffer = [];
+  Future<List<OwnedCoursesCalendar>> get coursesList async {
+    List<OwnedCoursesCalendar> buffer = [];
     var dio = Dio();
     dio.options.headers["Content-Type"] = "application/json";
     var resp = await dio.post(APISitemap.courseControl("get").toString(),
@@ -153,12 +158,12 @@ class CourseList extends StatefulWidget {
           "phoneno": phoneNo
         }));
     (resp.data as List<dynamic>).forEach((jsonObj) {
-      buffer.add(CoursesCalendar.fromJson(jsonObj));
+      buffer.add(OwnedCoursesCalendar.fromJson(jsonObj));
     });
     return buffer;
   }
 
-  void applyCourses(CoursesCalendar courses) async {
+  void applyCourses(OwnedCoursesCalendar courses) async {
     var dio = Dio();
     dio.options.headers["Content-Type"] = "application/json";
     await dio.post(APISitemap.courseControl("join").toString(),
@@ -180,7 +185,7 @@ class _CourseList extends State<CourseList> {
         title: Text("Available courses"),
         centerTitle: true,
       ),
-      body: FutureBuilder<List<CoursesCalendar>>(
+      body: FutureBuilder<List<OwnedCoursesCalendar>>(
         future: widget.coursesList,
         builder: (context, result) {
           if (result.connectionState == ConnectionState.waiting) {

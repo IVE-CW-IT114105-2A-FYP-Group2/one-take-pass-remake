@@ -88,10 +88,11 @@ class _OTPInbox extends State<OTPInbox> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Text(widget.isStudent
-                      ? "Instructors"
-                      : "Students" +
-                          " will be appeared when you found and started chatting")
+                  Text(
+                    (widget.isStudent ? "Instructors" : "Students") +
+                        " will be appeared when you found and started chatting",
+                    textAlign: TextAlign.center,
+                  )
                 ],
               ),
             );
