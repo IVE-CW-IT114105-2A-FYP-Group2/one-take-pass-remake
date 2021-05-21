@@ -14,10 +14,16 @@ import 'package:one_take_pass_remake/api/url/localapiurl.dart';
 import 'package:one_take_pass_remake/api/userdata/login_request.dart';
 import 'package:one_take_pass_remake/main.dart' show routeObserver;
 import 'package:one_take_pass_remake/pages/reusable/course_page.dart';
+import 'package:one_take_pass_remake/pages/reusable/event_page.dart';
+import 'package:one_take_pass_remake/pages/reusable/indentity_widget.dart';
 import 'package:one_take_pass_remake/themes.dart';
 import 'package:table_calendar/table_calendar.dart';
 
-class OTPCalender extends StatefulWidget {
+class OTPCalender extends StatefulWidget with IdentityWidget {
+  OTPCalender(UserREST identity) {
+    this.currentIdentity = identity;
+  }
+
   Future<List<PersonalCourseEvent>> get allEvents async {
     List<PersonalCourseEvent> e = [];
     var dio = Dio();
@@ -119,11 +125,15 @@ class _OTPCalender extends State<OTPCalender> with RouteAware {
                     padding: EdgeInsets.all(5),
                     itemCount: _pickedEvent.length,
                     itemBuilder: (context, count) => GestureDetector(
-                        onTap: () async {
-                          //When click the event, open in google calendar
-                          /*if (await canLaunch(_pickedEvent[count].htmlLink)) {
-                            await launch(_pickedEvent[count].htmlLink);
-                          }*/
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => CourseEventPage(
+                                        event: _pickedEvent[count],
+                                        isStudent:
+                                            (widget.roleName == "student"),
+                                      )));
                         },
                         child: Container(
                           width: MediaQuery.of(context).size.width,

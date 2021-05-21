@@ -139,8 +139,9 @@ class PersonalCourseEvent {
   factory PersonalCourseEvent.fromJson(Map<String, dynamic> json) =>
       PersonalCourseEvent(
           range: TimeRange(startTime: json["start"], endTime: json["stop"]),
-          stdPhono: json["student"],
-          insPhono: json["holder"],
+          //API swapped
+          stdPhono: json["holder"],
+          insPhono: json["student"],
           title: json["title"],
           id: json["cal_id"],
           status: json["status"]);

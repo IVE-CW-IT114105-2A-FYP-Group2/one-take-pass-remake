@@ -135,8 +135,10 @@ class _ChatComm extends State<ChatComm> {
         ),
         body: StatefulBuilder(builder: (context, sentState) {
           return Stack(
+            fit: StackFit.expand,
             children: [
               Container(
+                  margin: EdgeInsets.only(bottom: 48),
                   width: MediaQuery.of(context).size.width,
                   height: MediaQuery.of(context).size.height,
                   child: StreamBuilder(
@@ -163,9 +165,11 @@ class _ChatComm extends State<ChatComm> {
                   child: Row(
                     children: [
                       Container(
+                        color: Colors.white,
                         width: MediaQuery.of(context).size.width - 100,
                         child: TextField(
                           controller: _controller,
+                          maxLines: 1,
                           decoration: InputDecoration(
                               border: OutlineInputBorder(),
                               labelText: "Message"),
@@ -206,38 +210,42 @@ class _ChatElements {
     );
   }
 
-  static Padding _senderBox(String msg) {
-    return Padding(
-        padding: EdgeInsets.only(left: 100),
-        child: Container(
-          decoration: BoxDecoration(
-              color: OTPColour.light2,
-              shape: BoxShape.rectangle,
-              borderRadius: BorderRadius.all(Radius.circular(5))),
-          child: Padding(
-              padding: EdgeInsets.all(5),
-              child: Text(
-                msg,
-                style: TextStyle(fontSize: 18),
-                textAlign: TextAlign.right,
-              )),
-        ));
+  static Row _senderBox(String msg) {
+    return Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+      Container(
+        width: 250,
+        decoration: BoxDecoration(
+            color: OTPColour.light2,
+            shape: BoxShape.rectangle,
+            borderRadius: BorderRadius.all(Radius.circular(5))),
+        child: Padding(
+            padding: EdgeInsets.all(5),
+            child: Text(
+              msg,
+              style: TextStyle(fontSize: 18),
+              textAlign: TextAlign.right,
+              softWrap: true,
+            )),
+      )
+    ]);
   }
 
-  static Padding _receiverBox(String msg) {
-    return Padding(
-        padding: EdgeInsets.only(right: 100),
-        child: Container(
-          decoration: BoxDecoration(
-              color: Colors.grey,
-              shape: BoxShape.rectangle,
-              borderRadius: BorderRadius.all(Radius.circular(5))),
-          child: Padding(
-              padding: EdgeInsets.all(5),
-              child: Text(
-                msg,
-                style: TextStyle(fontSize: 18),
-              )),
-        ));
+  static Row _receiverBox(String msg) {
+    return Row(mainAxisAlignment: MainAxisAlignment.start, children: [
+      Container(
+        width: 250,
+        decoration: BoxDecoration(
+            color: Colors.grey,
+            shape: BoxShape.rectangle,
+            borderRadius: BorderRadius.all(Radius.circular(5))),
+        child: Padding(
+            padding: EdgeInsets.all(5),
+            child: Text(
+              msg,
+              style: TextStyle(fontSize: 18),
+              softWrap: true,
+            )),
+      )
+    ]);
   }
 }

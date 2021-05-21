@@ -44,7 +44,7 @@ _PageMap _pmap(UserREST cur) => _PageMap(pageOpt: [
       _PageOpt(
           bnb: BottomNavigationBarItem(
               icon: Icon(CupertinoIcons.calendar), label: "Calendar"),
-          opts: OTPCalender()),
+          opts: OTPCalender(cur)),
       _PageOpt(
           bnb: BottomNavigationBarItem(
               icon: Icon(CupertinoIcons.envelope), label: "Inbox"),
