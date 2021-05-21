@@ -6,6 +6,7 @@ import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 import 'package:one_take_pass_remake/api/url/localapiurl.dart';
 import 'package:one_take_pass_remake/api/userdata/login_request.dart';
+import 'package:one_take_pass_remake/pages/reusable/instructor_info.dart';
 import 'package:one_take_pass_remake/pages/subpages/export.dart';
 import 'package:one_take_pass_remake/themes.dart';
 import 'package:web_socket_channel/io.dart';
@@ -90,7 +91,15 @@ class _ChatComm extends State<ChatComm> {
                             children: [
                               TextButton(
                                   onPressed: widget.isStudent
-                                      ? () {}
+                                      ? () {
+                                          Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) => CourseList(
+                                                      phoneNo: widget
+                                                              .pickedRESTResult[
+                                                          "userPhoneNumber"])));
+                                        }
                                       : () {
                                           Navigator.push(
                                               context,

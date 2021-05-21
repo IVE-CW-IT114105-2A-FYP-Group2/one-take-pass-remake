@@ -163,13 +163,13 @@ class CourseList extends StatefulWidget {
     return buffer;
   }
 
-  void applyCourses(OwnedCoursesCalendar courses) async {
+  Future<void> applyCourses(OwnedCoursesCalendar courses) async {
     var dio = Dio();
     dio.options.headers["Content-Type"] = "application/json";
     await dio.post(APISitemap.courseControl("join").toString(),
         data: jsonEncode({
           "refresh_token": (await UserTokenLocalStorage.getToken()),
-          "id": courses.id
+          "course_id": courses.id
         }));
   }
 
@@ -198,7 +198,7 @@ class _CourseList extends State<CourseList> {
                   itemCount: result.data.length,
                   itemBuilder: (context, count) => Container(
                         width: MediaQuery.of(context).size.width,
-                        height: 250,
+                        height: 200,
                         margin: EdgeInsets.all(10),
                         padding: EdgeInsets.all(10),
                         decoration: BoxDecoration(
@@ -207,13 +207,23 @@ class _CourseList extends State<CourseList> {
                         child: Stack(
                           alignment: Alignment.centerLeft,
                           children: [
-                            Text(
-                              result.data[count].title,
-                              style: TextStyle(fontSize: 24),
-                            ),
-                            Text("Type: " + result.data[count].vehicleType),
+                            Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    result.data[count].title,
+                                    style: TextStyle(
+                                        fontSize: 28,
+                                        fontWeight: FontWeight.w500),
+                                  ),
+                                  Text(
+                                    "Type: " + result.data[count].vehicleType,
+                                    style: TextStyle(fontSize: 16),
+                                  ),
+                                ]),
                             Positioned(
                               child: MaterialButton(
+                                color: OTPColour.light1,
                                 child: Text("Show timetable and apply"),
                                 onPressed: () {
                                   showDialog(
@@ -232,13 +242,10 @@ class _CourseList extends State<CourseList> {
                                                   itemBuilder: (context,
                                                           timeCount) =>
                                                       Container(
-                                                        margin: EdgeInsets.only(
-                                                            top: 5, bottom: 5),
                                                         width: MediaQuery.of(
                                                                 context)
                                                             .size
                                                             .width,
-                                                        height: 100,
                                                         child: Column(
                                                           crossAxisAlignment:
                                                               CrossAxisAlignment
@@ -256,6 +263,12 @@ class _CourseList extends State<CourseList> {
                                                                     .courseTime[
                                                                         timeCount]
                                                                     .endTime),
+                                                            Divider(
+                                                              thickness: 2.5,
+                                                              color: OTPColour
+                                                                  .dark2,
+                                                              height: 5.0,
+                                                            )
                                                           ],
                                                         ),
                                                       )),
@@ -271,12 +284,72 @@ class _CourseList extends State<CourseList> {
                                                         color: Colors.red),
                                                   )),
                                               TextButton(
-                                                  onPressed: () {},
-                                                  child: Text(
-                                                    "Join",
-                                                    style: TextStyle(
-                                                        color: OTPColour.dark1),
-                                                  ))
+                                                  onPressed: () async {
+                                                    await showDialog(
+                                                        context: context,
+                                                        barrierDismissible:
+                                                            false,
+                                                        builder:
+                                                            (context) =>
+                                                                AlertDialog(
+                                                                  title: Text(
+                                                                      "Decided to join this courses?"),
+                                                                  actions: [
+                                                                    TextButton(
+                                                                        onPressed:
+                                                                            () {
+                                                                          Navigator.pop(
+                                                                              context);
+                                                                        },
+                                                                        child:
+                                                                            Text(
+                                                                          "No",
+                                                                          style:
+                                                                              TextStyle(color: Colors.red),
+                                                                        )),
+                                                                    TextButton(
+                                                                        onPressed:
+                                                                            () async {
+                                                                          bool isSuccess = await widget
+                                                                              .applyCourses(result.data[count])
+                                                                              .then((_) => true)
+                                                                              .onError((_, __) => false);
+                                                                          if (isSuccess) {
+                                                                            showDialog(
+                                                                                context: context,
+                                                                                builder: (context) => AlertDialog(
+                                                                                      title: Text("You joined this course"),
+                                                                                      actions: [
+                                                                                        TextButton(
+                                                                                            onPressed: () {
+                                                                                              Navigator.pop(context);
+                                                                                            },
+                                                                                            child: Text("OK"))
+                                                                                      ],
+                                                                                    )).then((_) {
+                                                                              Navigator.pop(context);
+                                                                            });
+                                                                          } else {
+                                                                            showDialog(
+                                                                                context: context,
+                                                                                builder: (context) => AlertDialog(
+                                                                                      title: Text("Joining course failed"),
+                                                                                      actions: [
+                                                                                        TextButton(
+                                                                                            onPressed: () {
+                                                                                              Navigator.pop(context);
+                                                                                            },
+                                                                                            child: Text("OK"))
+                                                                                      ],
+                                                                                    ));
+                                                                          }
+                                                                        },
+                                                                        child: Text(
+                                                                            "Yes")),
+                                                                  ],
+                                                                ));
+                                                  },
+                                                  child: Text("Join"))
                                             ],
                                           ));
                                 },
