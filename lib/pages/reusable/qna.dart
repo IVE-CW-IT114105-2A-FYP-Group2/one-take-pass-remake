@@ -436,7 +436,7 @@ abstract class _ReviewAnswer extends StatelessWidget {
               Text(
                 response(),
                 style: TextStyle(
-                    fontSize: 48,
+                    fontSize: 36,
                     fontWeight: FontWeight.w400,
                     color: Colors.black),
                 textAlign: TextAlign.center,
