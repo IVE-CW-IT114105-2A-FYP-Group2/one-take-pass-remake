@@ -78,11 +78,49 @@ class CoursesCalendar implements ClendarInteraface {
 
   factory CoursesCalendar.fromJson(Map<String, dynamic> json) {
     List<TimeRange> ranges = [];
-    (json["course_time"] as List<Map<String, String>>).forEach((r) {
+    (json["course_time"] as List<dynamic>).forEach((r) {
       ranges.add(TimeRange(startTime: r["start"], endTime: r["stop"]));
     });
     return CoursesCalendar(
         json["title"], json["type"], ranges, json["course_id"]);
+  }
+}
+
+class OwnedCoursesCalendar extends CoursesCalendar {
+  String _studentPhone, _teacherPhone, _status;
+  OwnedCoursesCalendar(
+      String title,
+      String vehicleType,
+      List<TimeRange> courseTime,
+      dynamic id,
+      String teacherPhone,
+      String studentPhone,
+      String status)
+      : super(title, vehicleType, courseTime, id) {
+    this._studentPhone = studentPhone;
+    this._teacherPhone = teacherPhone;
+    this._status = status;
+  }
+
+  String get teacherPhone => _teacherPhone;
+
+  String get studentPhone => _studentPhone;
+
+  String get status => _status;
+
+  factory OwnedCoursesCalendar.fromJson(Map<String, dynamic> json) {
+    List<TimeRange> ranges = [];
+    (json["course_time"] as List<dynamic>).forEach((r) {
+      ranges.add(TimeRange(startTime: r["start"], endTime: r["stop"]));
+    });
+    return OwnedCoursesCalendar(
+        json["title"],
+        json["type"],
+        ranges,
+        json["course_id"],
+        json["teacheer_phone"],
+        json["student_phone"],
+        json["status"]);
   }
 }
 

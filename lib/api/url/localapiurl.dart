@@ -32,8 +32,6 @@ class APISitemap {
       case "join":
       case "accept":
         return Uri.https(_apiUrl, 'course/join');
-      case "order":
-        return Uri.https(_apiUrl, 'course/request');
     }
   }
 

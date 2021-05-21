@@ -178,128 +178,47 @@ class _SearchList extends StatelessWidget {
 
 ///Instructor exclusive page for accepting or rejecting student to attnd the courses
 class _IncomingRequest extends StatefulWidget {
-  Future<List<CoursesCalendar>> get orderedCourses async {
-    List<CoursesCalendar> buffer = [];
-    var dio = Dio();
-    dio.options.headers["Content-Type"] = "application/json";
-    var resp = await dio.post(APISitemap.courseControl("order").toString(),
-        data: jsonEncode(
-            {"refresh_token": (await UserTokenLocalStorage.getToken())}));
-    (resp.data as List<dynamic>).forEach((jsonObj) {
-      buffer.add(CoursesCalendar.fromJson(jsonObj));
-    });
-    return buffer;
-  }
-
   @override
   State<StatefulWidget> createState() => _IncomingRequestUI();
 }
 
 class _IncomingRequestUI extends State<_IncomingRequest> {
+  TextEditingController _pin;
+
+  @override
+  void initState() {
+    super.initState();
+    _pin = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _pin.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<CoursesCalendar>>(
-      future: widget.orderedCourses,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(
-            child: CircularProgressIndicator(),
-          );
-        } else {
-          if (snapshot.hasData) {
-            return Container(
-                width: MediaQuery.of(context).size.width,
-                height: MediaQuery.of(context).size.height,
-                child: Column(children: [
-                  Padding(
-                    child: Text(
-                      "Incoming request from students",
-                      style: TextStyle(fontSize: 16),
-                      textAlign: TextAlign.center,
-                    ),
-                    padding: EdgeInsets.only(bottom: 5),
-                  ),
-                  Expanded(
-                      child: ListView.builder(
-                          itemCount: snapshot.data.length,
-                          itemBuilder: (context, count) => GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => _CourseDetail(
-                                            courses: snapshot.data[count])));
-                              },
-                              child: Container(
-                                  alignment: Alignment.centerLeft,
-                                  height: 80,
-                                  width: MediaQuery.of(context).size.width,
-                                  decoration:
-                                      BoxDecoration(color: OTPColour.light2),
-                                  margin: EdgeInsets.all(2.5),
-                                  padding: EdgeInsets.all(5),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        snapshot.data[count].title,
-                                        style: TextStyle(fontSize: 18),
-                                      ),
-                                      Text("Durations:"),
-                                      Text((<String>() {
-                                        var start = snapshot.data[count]
-                                                .courseTime.first.startTime,
-                                            end = snapshot.data[count]
-                                                .courseTime.last.endTime;
-                                        return start + " - " + end;
-                                      }()))
-                                    ],
-                                  ))))),
-                  Container(
-                      margin: EdgeInsets.all(10),
-                      height: 50,
-                      width: MediaQuery.of(context).size.width,
-                      child: MaterialButton(
-                        onPressed: () {
-                          setState(() {});
-                        },
-                        child: Text("Reload"),
-                        color: OTPColour.light2,
-                      ))
-                ]));
-          } else {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Icon(
-                    CupertinoIcons.xmark_circle,
-                    size: 120,
-                  ),
-                  Text(
-                    "Sorry, we can't fetch incoming request",
-                    style: TextStyle(fontSize: 24),
-                  ),
-                  Container(
-                      margin: EdgeInsets.all(10),
-                      height: 60,
-                      width: MediaQuery.of(context).size.width,
-                      child: MaterialButton(
-                        onPressed: () {
-                          setState(() {});
-                        },
-                        color: OTPColour.light2,
-                        child: Text("Reload"),
-                      ))
-                ],
-              ),
-            );
-          }
-        }
-      },
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Center(
+          child: Text("Please enter calendar course code to start the lesson:",
+              textAlign: TextAlign.center),
+        ),
+        Container(
+          width: MediaQuery.of(context).size.width,
+          height: 40,
+          margin: EdgeInsets.all(15),
+          alignment: Alignment.center,
+          child: TextField(
+            controller: _pin,
+            maxLines: 1,
+            minLines: 1,
+          ),
+        )
+      ],
     );
   }
 }

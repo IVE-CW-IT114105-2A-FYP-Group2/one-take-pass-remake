@@ -12,26 +12,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 final String contentKey = "otp_chat_name";
 
 class OTPInbox extends StatefulWidget with IdentityWidget {
-  Timer t;
-
   StreamController<List<dynamic>> contactStream =
       StreamController<List<dynamic>>();
 
   OTPInbox(UserREST rest) {
     this.currentIdentity = rest;
-    var dio = Dio();
-    dio.options.headers["Content-Type"] = "application/json";
-    t = Timer.periodic(Duration(seconds: 1), (timer) async {
-      dio
-          .post(APISitemap.chatControl("get_contact").toString(),
-              data: jsonEncode(
-                  {"refresh_token": (await UserTokenLocalStorage.getToken())}))
-          .then((resp) {
-        if (!contactStream.isClosed && resp.data != null) {
-          contactStream.sink.add(resp.data);
-        }
-      }).onError((error, stackTrace) {});
-    });
   }
 
   @override
@@ -41,9 +26,28 @@ class OTPInbox extends StatefulWidget with IdentityWidget {
 }
 
 class _OTPInbox extends State<OTPInbox> {
+  Timer t;
+  @override
+  void initState() {
+    super.initState();
+    var dio = Dio();
+    dio.options.headers["Content-Type"] = "application/json";
+    t = Timer.periodic(Duration(seconds: 1), (timer) async {
+      dio
+          .post(APISitemap.chatControl("get_contact").toString(),
+              data: jsonEncode(
+                  {"refresh_token": (await UserTokenLocalStorage.getToken())}))
+          .then((resp) {
+        if (!widget.contactStream.isClosed && resp.data != null) {
+          widget.contactStream.sink.add(resp.data);
+        }
+      }).onError((error, stackTrace) {});
+    });
+  }
+
   @override
   void dispose() {
-    widget.t.cancel();
+    t.cancel();
     widget.contactStream.close();
     super.dispose();
   }

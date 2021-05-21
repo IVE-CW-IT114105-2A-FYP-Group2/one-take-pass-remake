@@ -13,6 +13,7 @@ import 'package:one_take_pass_remake/api/calendar/calendar.dart';
 import 'package:one_take_pass_remake/api/url/localapiurl.dart';
 import 'package:one_take_pass_remake/api/userdata/login_request.dart';
 import 'package:one_take_pass_remake/main.dart' show routeObserver;
+import 'package:one_take_pass_remake/pages/reusable/course_page.dart';
 import 'package:one_take_pass_remake/themes.dart';
 import 'package:table_calendar/table_calendar.dart';
 
@@ -41,11 +42,6 @@ class _OTPCalender extends State<OTPCalender> with RouteAware {
   CalendarFormat _format = CalendarFormat.month;
 
   List<PersonalCourseEvent> _pickedEvent = [];
-
-  @override
-  void initState() {
-    super.initState();
-  }
 
   @override
   void didChangeDependencies() {
@@ -390,7 +386,7 @@ class _OTPCalenderEventAdder extends State<OTPCalenderEventAdder> {
                   //Get token before submit
                   UserTokenLocalStorage.getToken().then((token) {
                     course["refresh_token"] = token;
-                    course["student"] = _controllers["stdPhoneNo"];
+                    course["student"] = _controllers["stdPhoneNo"].text;
                     return jsonEncode(course);
                   }).then((restCourse) async {
                     var dio = Dio();
@@ -530,16 +526,15 @@ class _OTPCalenderEventAdder extends State<OTPCalenderEventAdder> {
 }
 
 class OTPListExistedCourses extends StatefulWidget {
-  Future<List<CoursesCalendar>> get ownerCourses async {
-    List<CoursesCalendar> buffer = [];
+  Future<List<OwnedCoursesCalendar>> get ownerCourses async {
+    List<OwnedCoursesCalendar> buffer = [];
     var dio = Dio();
     dio.options.headers["Content-Type"] = "application/json";
     var resp = await dio.post(APISitemap.courseControl("get").toString(),
         data: jsonEncode(
             {"refresh_token": (await UserTokenLocalStorage.getToken())}));
     (resp.data as List<dynamic>).forEach((jsonObj) {
-      print(jsonObj);
-      buffer.add(CoursesCalendar.fromJson(jsonObj));
+      buffer.add(OwnedCoursesCalendar.fromJson(jsonObj));
     });
     return buffer;
   }
@@ -548,7 +543,25 @@ class OTPListExistedCourses extends StatefulWidget {
   State<StatefulWidget> createState() => _OTPListExistedCourses();
 }
 
-class _OTPListExistedCourses extends State<OTPListExistedCourses> {
+class _OTPListExistedCourses extends State<OTPListExistedCourses>
+    with RouteAware {
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    routeObserver.subscribe(this, ModalRoute.of(context));
+  }
+
+  @override
+  void dispose() {
+    routeObserver.unsubscribe(this);
+    super.dispose();
+  }
+
+  @override
+  void didPopNext() {
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -556,7 +569,7 @@ class _OTPListExistedCourses extends State<OTPListExistedCourses> {
         title: Text("Your owned courses"),
         centerTitle: true,
       ),
-      body: FutureBuilder<List<CoursesCalendar>>(
+      body: FutureBuilder<List<OwnedCoursesCalendar>>(
           future: widget.ownerCourses,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
@@ -567,25 +580,42 @@ class _OTPListExistedCourses extends State<OTPListExistedCourses> {
               if (snapshot.hasData) {
                 return ListView.builder(
                     itemCount: snapshot.data.length,
-                    itemBuilder: (context, count) => Container(
-                          margin: EdgeInsets.all(10),
-                          width: MediaQuery.of(context).size.width,
-                          height: 200,
-                          child: Padding(
-                            padding: EdgeInsets.all(10),
-                            child: Stack(
-                              children: [
-                                Text(
-                                  snapshot.data[count].title,
-                                  style: TextStyle(
-                                      fontSize: 24,
-                                      fontWeight: FontWeight.w700),
+                    itemBuilder: (context, count) => Padding(
+                        padding: EdgeInsets.all(7.5),
+                        child: GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => CourseDetailPage(
+                                          course: snapshot.data[count])));
+                            },
+                            child: Container(
+                              alignment: Alignment.centerLeft,
+                              decoration: BoxDecoration(
+                                  color: OTPColour.light1,
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(2))),
+                              margin: EdgeInsets.all(10),
+                              width: MediaQuery.of(context).size.width,
+                              height: 100,
+                              child: Padding(
+                                padding: EdgeInsets.all(10),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      snapshot.data[count].title,
+                                      style: TextStyle(
+                                          fontSize: 24,
+                                          fontWeight: FontWeight.w700),
+                                    ),
+                                    Text("Type: " +
+                                        snapshot.data[count].vehicleType)
+                                  ],
                                 ),
-                                Text("Type:" + snapshot.data[count].vehicleType)
-                              ],
-                            ),
-                          ),
-                        ));
+                              ),
+                            ))));
               } else {
                 return Center(
                   child: Column(
