@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 //import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
@@ -60,8 +62,19 @@ MaterialButton _elButton(IconData icon, String label, Function onclick) {
 Future<List<dynamic>> getMarks() async {
   var dio = Dio();
   dio.options.headers['Content-Type'] = "application/json";
-  var resp = await dio.post(APISitemap.recentMockMark.toString(),
-      data: {"refresh_token": await UserTokenLocalStorage.getToken()});
+  var resp;
+  try {
+    resp = await dio.post(APISitemap.recentMockMark.toString(),
+        data: jsonEncode(
+            {"refresh_token": (await UserTokenLocalStorage.getToken())}));
+  } on DioError catch (e) {
+    if (e.response.data["msg"] == "The user did not submit a score before") {
+      return [];
+    } else {
+      throw "Error from HTTP";
+    }
+  }
+
   return resp.data;
 }
 
