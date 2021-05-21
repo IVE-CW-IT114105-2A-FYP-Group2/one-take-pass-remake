@@ -21,6 +21,8 @@ class APISitemap {
 
   static Uri get calendar => Uri.https(_apiUrl, 'calendar/get');
 
+  static Uri get attendEvent => Uri.https(_apiUrl, 'calendar/event');
+
   static Uri courseControl(String action) {
     switch (action.toLowerCase()) {
       case "add":

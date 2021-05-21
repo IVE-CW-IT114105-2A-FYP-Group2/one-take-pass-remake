@@ -146,6 +146,7 @@ class _ChatComm extends State<ChatComm> {
                       builder: (context, msgobj) {
                         if (msgobj.hasData) {
                           return ListView.builder(
+                              shrinkWrap: true,
                               itemCount: msgobj.data.length,
                               itemBuilder: (context, msgpos) =>
                                   _ChatElements._getMsgBox(

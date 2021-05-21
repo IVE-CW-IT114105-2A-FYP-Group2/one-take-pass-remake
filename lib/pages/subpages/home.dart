@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:one_take_pass_remake/api/calendar/calendar.dart';
 import 'package:one_take_pass_remake/api/misc.dart';
 import 'package:one_take_pass_remake/api/url/localapiurl.dart';
@@ -23,7 +24,7 @@ class OTPHome extends StatelessWidget with IdentityWidget {
       margin: EdgeInsets.all(5),
       padding: EdgeInsets.all(5),
       child: (roleName == "privateDrivingInstructor")
-          ? _IncomingRequest()
+          ? _InstructorWelcome()
           : _FindDriver(),
     );
   }
@@ -176,158 +177,22 @@ class _SearchList extends StatelessWidget {
   }
 }
 
-///Instructor exclusive page for accepting or rejecting student to attnd the courses
-class _IncomingRequest extends StatefulWidget {
-  @override
-  State<StatefulWidget> createState() => _IncomingRequestUI();
-}
-
-class _IncomingRequestUI extends State<_IncomingRequest> {
-  TextEditingController _pin;
-
-  @override
-  void initState() {
-    super.initState();
-    _pin = TextEditingController();
-  }
-
-  @override
-  void dispose() {
-    _pin.dispose();
-    super.dispose();
-  }
-
+class _InstructorWelcome extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Center(
-          child: Text("Please enter calendar course code to start the lesson:",
-              textAlign: TextAlign.center),
+        Text(
+          "To ckeck student message, please go to inbox tab",
+          textAlign: TextAlign.center,
         ),
-        Container(
-          width: MediaQuery.of(context).size.width,
-          height: 40,
-          margin: EdgeInsets.all(15),
-          alignment: Alignment.center,
-          child: TextField(
-            controller: _pin,
-            maxLines: 1,
-            minLines: 1,
-          ),
+        Divider(),
+        Text(
+          "To manage your courses and schdule, please go to calendar tab",
+          textAlign: TextAlign.center,
         )
       ],
-    );
-  }
-}
-
-class _CourseDetail extends StatelessWidget {
-  ///Contain courses
-  final CoursesCalendar courses;
-
-  _CourseDetail({@required this.courses});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Request detail"),
-        centerTitle: true,
-      ),
-      body: Container(
-        width: MediaQuery.of(context).size.width,
-        height: MediaQuery.of(context).size.height,
-        margin: EdgeInsets.all(5),
-        child: Column(
-          children: [
-            Expanded(
-                child: ListView(
-              children: [
-                Text(
-                  "Course title",
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.w700),
-                ),
-                Text(courses.title, style: TextStyle(fontSize: 18)),
-                Divider(indent: 5),
-                Text(
-                  "Vehicle type",
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.w700),
-                ),
-                Text(courses.vehicleType, style: TextStyle(fontSize: 18)),
-                Divider(indent: 5),
-                Text(
-                  "Timetable",
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.w700),
-                ),
-                Container(
-                  width: MediaQuery.of(context).size.width,
-                  height: 300,
-                  child: ListView.builder(
-                      itemCount: courses.courseTime.length,
-                      itemBuilder: (context, count) {
-                        var dtObj = courses.courseTime[count].parsedToDateTime;
-                        String getDate(DateTime dt) {
-                          return dt.year.toString() +
-                              "-" +
-                              dt.month.toString() +
-                              "-" +
-                              dt.day.toString();
-                        }
-
-                        String getTime(DateTime dt) {
-                          return ((dt.hour < 10) ? "0" : "") +
-                              dt.hour.toString() +
-                              ":" +
-                              ((dt.minute < 10) ? "0" : "") +
-                              dt.minute.toString();
-                        }
-
-                        return Container(
-                          width: MediaQuery.of(context).size.width,
-                          height: 50,
-                          alignment: Alignment.center,
-                          margin: EdgeInsets.all(5),
-                          decoration: BoxDecoration(
-                              border:
-                                  Border.all(width: 2, color: OTPColour.dark1)),
-                          child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Text(
-                                  "Date: " + getDate(dtObj["start"]),
-                                  style: TextStyle(fontSize: 16),
-                                ),
-                                Padding(
-                                    padding:
-                                        EdgeInsets.only(left: 10, right: 10)),
-                                Text(
-                                  "Time: " +
-                                      getTime(dtObj["start"]) +
-                                      " - " +
-                                      getTime(dtObj["stop"]),
-                                  style: TextStyle(fontSize: 16),
-                                )
-                              ]),
-                        );
-                      }),
-                )
-              ],
-            )),
-            Container(
-                width: MediaQuery.of(context).size.width,
-                height: 40,
-                margin: EdgeInsets.all(5),
-                child: MaterialButton(
-                  color: OTPColour.light2,
-                  child: Text("Accept this course request"),
-                  onPressed: () {},
-                ))
-          ],
-        ),
-      ),
     );
   }
 }
