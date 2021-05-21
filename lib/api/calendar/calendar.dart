@@ -125,13 +125,23 @@ class OwnedCoursesCalendar extends CoursesCalendar {
 }
 
 class PersonalCourseEvent {
+  final dynamic id;
   final TimeRange range;
-  final String stdPhono, insPhono;
-  PersonalCourseEvent({this.range, this.stdPhono, this.insPhono});
+  final String stdPhono, insPhono, title, status;
+  PersonalCourseEvent(
+      {this.range,
+      this.stdPhono,
+      this.insPhono,
+      this.title,
+      this.id,
+      this.status});
 
   factory PersonalCourseEvent.fromJson(Map<String, dynamic> json) =>
       PersonalCourseEvent(
           range: TimeRange(startTime: json["start"], endTime: json["stop"]),
           stdPhono: json["student"],
-          insPhono: json["holder"]);
+          insPhono: json["holder"],
+          title: json["title"],
+          id: json["cal_id"],
+          status: json["status"]);
 }

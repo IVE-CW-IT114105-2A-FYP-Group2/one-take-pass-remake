@@ -137,7 +137,7 @@ class _OTPCalender extends State<OTPCalender> with RouteAware {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                (DateFormat("MMMM d").format(_pickedEvent[count]
+                                (DateFormat("MMM d").format(_pickedEvent[count]
                                         .range
                                         .parsedToDateTime["start"]) +
                                     "\t\t\t\t" +
@@ -147,14 +147,19 @@ class _OTPCalender extends State<OTPCalender> with RouteAware {
                                     " - " +
                                     DateFormat.Hm().format(_pickedEvent[count]
                                         .range
-                                        .parsedToDateTime["end"])),
+                                        .parsedToDateTime["stop"])),
                                 style: TextStyle(
-                                    fontSize: 18, fontWeight: FontWeight.w300),
+                                    fontSize: 24, fontWeight: FontWeight.w300),
                               ),
                               Text(
-                                "Course",
-                                style: TextStyle(fontSize: 16),
+                                _pickedEvent[count].title,
+                                style: TextStyle(fontSize: 18),
                               ),
+                              Text("Status: " + _pickedEvent[count].status,
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w400,
+                                  ))
                             ],
                           ),
                         ))),
@@ -165,7 +170,7 @@ class _OTPCalender extends State<OTPCalender> with RouteAware {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<PersonalCourseEvent>>(
-        future: Future.delayed(Duration(seconds: 1), () => []),
+        future: widget.allEvents,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(
