@@ -6,6 +6,7 @@ import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 import 'package:one_take_pass_remake/api/url/localapiurl.dart';
 import 'package:one_take_pass_remake/api/userdata/login_request.dart';
+import 'package:one_take_pass_remake/pages/subpages/export.dart';
 import 'package:one_take_pass_remake/themes.dart';
 import 'package:web_socket_channel/io.dart';
 
@@ -88,9 +89,23 @@ class _ChatComm extends State<ChatComm> {
                       builder: (context) => SimpleDialog(
                             children: [
                               TextButton(
-                                  onPressed: () {},
+                                  onPressed: widget.isStudent
+                                      ? () {}
+                                      : () {
+                                          Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      OTPCalenderEventAdder(
+                                                        studentPhone: widget
+                                                                .pickedRESTResult[
+                                                            "userPhoneNumber"],
+                                                      )));
+                                        },
                                   child: Text(
-                                    "Make appointment",
+                                    widget.isStudent
+                                        ? "Join Course"
+                                        : "Create course for this student",
                                     style: TextStyle(
                                         fontSize: 16,
                                         color: OTPColour.dark1,

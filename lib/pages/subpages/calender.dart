@@ -208,6 +208,10 @@ class _OTPCalender extends State<OTPCalender> with RouteAware {
 }
 
 class OTPCalenderEventAdder extends StatefulWidget {
+  final String studentPhone;
+
+  OTPCalenderEventAdder({this.studentPhone});
+
   @override
   State<StatefulWidget> createState() => _OTPCalenderEventAdder();
 }
@@ -284,7 +288,11 @@ class _OTPCalenderEventAdder extends State<OTPCalenderEventAdder> {
   void initState() {
     super.initState();
     initializeDateFormatting();
-    _controllers = {"summary": TextEditingController()};
+    _controllers = {
+      "summary": TextEditingController(),
+      "stdPhoneNo": TextEditingController(),
+    };
+    _controllers["stdPhoneNo"].text = widget.studentPhone;
   }
 
   @override
@@ -382,6 +390,7 @@ class _OTPCalenderEventAdder extends State<OTPCalenderEventAdder> {
                   //Get token before submit
                   UserTokenLocalStorage.getToken().then((token) {
                     course["refresh_token"] = token;
+                    course["student"] = _controllers["stdPhoneNo"];
                     return jsonEncode(course);
                   }).then((restCourse) async {
                     var dio = Dio();
@@ -500,8 +509,17 @@ class _OTPCalenderEventAdder extends State<OTPCalenderEventAdder> {
                 Text("On every:"),
                 Container(
                     width: MediaQuery.of(context).size.width,
-                    height: 200,
-                    child: ListView(children: _weekDayPickers()))
+                    height: 150,
+                    child: ListView(children: _weekDayPickers())),
+                Divider(),
+                Text("Student phone number"),
+                TextField(
+                  controller: _controllers["stdPhoneNo"],
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  maxLines: 1,
+                  minLines: 1,
+                  readOnly: widget.studentPhone?.isNotEmpty ?? false,
+                )
               ],
             ),
           ),
@@ -520,6 +538,7 @@ class OTPListExistedCourses extends StatefulWidget {
         data: jsonEncode(
             {"refresh_token": (await UserTokenLocalStorage.getToken())}));
     (resp.data as List<dynamic>).forEach((jsonObj) {
+      print(jsonObj);
       buffer.add(CoursesCalendar.fromJson(jsonObj));
     });
     return buffer;

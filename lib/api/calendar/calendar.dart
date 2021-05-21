@@ -81,7 +81,8 @@ class CoursesCalendar implements ClendarInteraface {
     (json["course_time"] as List<Map<String, String>>).forEach((r) {
       ranges.add(TimeRange(startTime: r["start"], endTime: r["stop"]));
     });
-    return CoursesCalendar(json["title"], json["type"], ranges, json["id"]);
+    return CoursesCalendar(
+        json["title"], json["type"], ranges, json["course_id"]);
   }
 }
 
