@@ -90,7 +90,7 @@ class _OTPAbout extends State<OTPAbout> with RouteAware {
         child: MaterialButton(
           padding: EdgeInsets.all(10),
           color: OTPColour.mainTheme,
-          child: Text("Your comment",
+          child: Text("Your comments",
               style: TextStyle(fontSize: 16, color: Colors.white)),
           onPressed: () {
             Navigator.push(context,

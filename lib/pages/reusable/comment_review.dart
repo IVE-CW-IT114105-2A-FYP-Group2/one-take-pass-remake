@@ -51,7 +51,7 @@ class _CommentReview extends State<CommentReview> {
                       width: MediaQuery.of(context).size.width,
                       height: MediaQuery.of(context).size.height,
                       alignment: Alignment.center,
-                      child: Text("You have no comment right now"),
+                      child: Text("You have no comments right now"),
                     );
             } else {
               return Center(
@@ -61,7 +61,7 @@ class _CommentReview extends State<CommentReview> {
                       CupertinoIcons.xmark_circle,
                       size: 120,
                     ),
-                    Text("Unable to get your comment")
+                    Text("Unable to get comments")
                   ],
                 ),
               );
@@ -80,7 +80,8 @@ class CommentReviewPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text((targetPhone == null) ? "Your comment" : "His/Her comment"),
+        title:
+            Text((targetPhone == null) ? "Your comments" : "His/Her comments"),
         centerTitle: true,
       ),
       body: CommentReview(
