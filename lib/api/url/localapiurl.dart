@@ -25,6 +25,8 @@ class APISitemap {
 
   static Uri get userComment => Uri.https(_apiUrl, 'getinfo/comment');
 
+  static Uri get submitComment => Uri.https(_apiUrl, 'calendar/comment');
+
   static Uri courseControl(String action) {
     switch (action.toLowerCase()) {
       case "add":

@@ -225,6 +225,7 @@ class OTPLogin extends StatelessWidget {
 
 ///Trigger login if user is not login yet
 void requireLogin(Route currentRoute, BuildContext context) {
+  OTPIndex.showCommentDialog = true;
   //Naviaate
   Navigator.replace(context,
       oldRoute: currentRoute,

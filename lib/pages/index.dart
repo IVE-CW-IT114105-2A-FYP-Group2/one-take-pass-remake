@@ -1,8 +1,11 @@
 import 'dart:async';
+import 'dart:convert';
 
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:one_take_pass_remake/api/url/localapiurl.dart';
 import 'package:one_take_pass_remake/api/userdata/login_request.dart';
 import 'package:one_take_pass_remake/pages/login.dart';
 import 'package:one_take_pass_remake/themes.dart';
@@ -60,11 +63,26 @@ _PageMap _pmap(UserREST cur) => _PageMap(pageOpt: [
     ]);
 
 class OTPIndex extends StatefulWidget {
+  static bool showCommentDialog = true;
   @override
   State<StatefulWidget> createState() => _OTPIndex();
 }
 
 class _OTPIndex extends State<OTPIndex> {
+  TextEditingController _commentCtrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _commentCtrl = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _commentCtrl.dispose();
+    super.dispose();
+  }
+
   int _currentIdx = 0;
 
   void _onTab(int idx) {
@@ -129,6 +147,83 @@ class _OTPIndex extends State<OTPIndex> {
   Widget build(BuildContext context) {
     Scaffold _pageWithIdentityFactory(UserREST cur) {
       var _ipmap = _pmap(cur);
+      if (OTPIndex.showCommentDialog) {
+        OTPIndex.showCommentDialog = false;
+        Future.delayed(Duration(seconds: 5), () {
+          showDialog(
+              context: context,
+              builder: (content) => AlertDialog(
+                    contentPadding: EdgeInsets.all(25),
+                    title: Text("Leave comment"),
+                    content: Column(mainAxisSize: MainAxisSize.min, children: [
+                      Text(
+                          "You attended course 'How to be a good driver' recently, you can leave comment here: "),
+                      TextField(
+                        controller: _commentCtrl,
+                      )
+                    ]),
+                    actions: [
+                      TextButton(
+                          onPressed: () {
+                            Navigator.pop(context, false);
+                          },
+                          child: Text(
+                            "No, thanks",
+                            style: TextStyle(color: Colors.red),
+                          )),
+                      TextButton(
+                          onPressed: () async {
+                            if (_commentCtrl.text.isNotEmpty) {
+                              var dio = Dio();
+                              dio.options.headers["Content-Type"] =
+                                  "application/json";
+                              dio
+                                  .post(APISitemap.submitComment.toString(),
+                                      data: jsonEncode({
+                                        "refresh_token":
+                                            (await UserTokenLocalStorage
+                                                .getToken()),
+                                        "cal_id": "60a78e9f0c15b80c21e02e32",
+                                        "comment": _commentCtrl.text
+                                      }))
+                                  .then((_) {
+                                Navigator.pop(context, true);
+                              }).onError((_, __) {
+                                showDialog(
+                                    context: context,
+                                    builder: (context) => AlertDialog(
+                                          title: Text("Submit comment failed"),
+                                          actions: [
+                                            TextButton(
+                                                onPressed: () {
+                                                  Navigator.pop(context);
+                                                },
+                                                child: Text("OK"))
+                                          ],
+                                        ));
+                              });
+                            }
+                          },
+                          child: Text("Submit"))
+                    ],
+                  )).then((isSubmit) {
+            if (isSubmit) {
+              showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                        title: Text("Comment submitted"),
+                        actions: [
+                          TextButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              child: Text("OK"))
+                        ],
+                      ));
+            }
+          });
+        });
+      }
       return Scaffold(
         appBar: AppBar(
           title: Text("One Take Pass"),

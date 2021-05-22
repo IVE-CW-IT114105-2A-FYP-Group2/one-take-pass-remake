@@ -33,7 +33,7 @@ class UserComments {
     try {
       resp = await dio.post(APISitemap.userComment.toString(),
           data: jsonEncode(req));
-      (resp.data["comment"] as List<dynamic>).forEach((cObj) {
+      (resp.data as List<dynamic>).forEach((cObj) {
         cL.add(OTPComment.fromJson(cObj));
       });
       return cL;
