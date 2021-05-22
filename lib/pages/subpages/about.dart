@@ -10,10 +10,16 @@ import 'package:one_take_pass_remake/api/userdata/login_request.dart';
 import 'package:one_take_pass_remake/main.dart' show routeObserver;
 import 'package:one_take_pass_remake/pages/index.dart' show UserIdentify;
 import 'package:one_take_pass_remake/pages/login.dart';
+import 'package:one_take_pass_remake/pages/reusable/comment_review.dart';
+import 'package:one_take_pass_remake/pages/reusable/indentity_widget.dart';
 //import 'package:one_take_pass_remake/pages/reusable/link_google.dart';
 import 'package:one_take_pass_remake/themes.dart';
 
-class OTPAbout extends StatefulWidget {
+class OTPAbout extends StatefulWidget with IdentityWidget {
+  OTPAbout(UserREST identity) {
+    this.currentIdentity = identity;
+  }
+
   @override
   State<StatefulWidget> createState() => _OTPAbout();
 }
@@ -47,8 +53,7 @@ class _OTPAbout extends State<OTPAbout> with RouteAware {
   //bool _status = true;
   @override
   Widget build(BuildContext context) {
-    return Center(
-        child: Column(children: [
+    final List<Widget> content = [
       Padding(padding: EdgeInsets.only(top: 10)),
       Expanded(
           child: Center(
@@ -78,6 +83,23 @@ class _OTPAbout extends State<OTPAbout> with RouteAware {
           ],
         ),
       )),
+    ];
+    if (widget.roleName == "student") {
+      content.add(Container(
+        width: MediaQuery.of(context).size.width - 10,
+        child: MaterialButton(
+          padding: EdgeInsets.all(10),
+          color: OTPColour.mainTheme,
+          child: Text("Your comment",
+              style: TextStyle(fontSize: 16, color: Colors.white)),
+          onPressed: () {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => CommentReviewPage()));
+          },
+        ),
+      ));
+    }
+    content.addAll([
       Container(
         width: MediaQuery.of(context).size.width - 10,
         child: MaterialButton(
@@ -131,7 +153,8 @@ class _OTPAbout extends State<OTPAbout> with RouteAware {
           },
         ),
       )
-    ]));
+    ]);
+    return Center(child: Column(children: content));
   }
 }
 

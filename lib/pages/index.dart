@@ -56,7 +56,7 @@ _PageMap _pmap(UserREST cur) => _PageMap(pageOpt: [
       _PageOpt(
           bnb: BottomNavigationBarItem(
               icon: Icon(CupertinoIcons.person), label: "About"),
-          opts: OTPAbout())
+          opts: OTPAbout(cur))
     ]);
 
 class OTPIndex extends StatefulWidget {

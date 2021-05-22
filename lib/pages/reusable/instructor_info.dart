@@ -8,6 +8,7 @@ import 'package:one_take_pass_remake/api/url/localapiurl.dart';
 import 'package:one_take_pass_remake/api/userdata/login_request.dart';
 import 'package:one_take_pass_remake/api/userdata/users.dart';
 import 'package:one_take_pass_remake/pages/reusable/chatting.dart';
+import 'package:one_take_pass_remake/pages/reusable/comment_review.dart';
 import 'package:one_take_pass_remake/pages/subpages/export.dart';
 import 'package:one_take_pass_remake/themes.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -119,6 +120,22 @@ class InstructorInfo extends StatelessWidget {
                             )));
               },
               child: Text("Open chat"),
+            ),
+          ),
+          Container(
+            margin: EdgeInsets.all(10),
+            width: MediaQuery.of(context).size.width,
+            child: MaterialButton(
+              color: OTPColour.light1,
+              onPressed: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => CommentReviewPage(
+                              targetPhone: instructor.userPhoneNumber,
+                            )));
+              },
+              child: Text("His/Her comments"),
             ),
           ),
           Container(

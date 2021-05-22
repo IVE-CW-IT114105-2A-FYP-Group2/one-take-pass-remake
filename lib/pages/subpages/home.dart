@@ -9,6 +9,7 @@ import 'package:one_take_pass_remake/api/misc.dart';
 import 'package:one_take_pass_remake/api/url/localapiurl.dart';
 import 'package:one_take_pass_remake/api/userdata/login_request.dart'
     show UserREST, UserTokenLocalStorage;
+import 'package:one_take_pass_remake/pages/reusable/comment_review.dart';
 import 'package:one_take_pass_remake/pages/reusable/indentity_widget.dart';
 import 'package:one_take_pass_remake/pages/reusable/instructor_info.dart';
 import 'package:one_take_pass_remake/themes.dart';
@@ -184,14 +185,16 @@ class _InstructorWelcome extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(
-          "To ckeck student message, please go to inbox tab",
+          "Your comment",
           textAlign: TextAlign.center,
+          style: TextStyle(fontSize: 24),
         ),
         Divider(),
-        Text(
-          "To manage your courses and schdule, please go to calendar tab",
-          textAlign: TextAlign.center,
-        )
+        Expanded(
+            child: Padding(
+          padding: EdgeInsets.all(5),
+          child: CommentReview(),
+        ))
       ],
     );
   }
