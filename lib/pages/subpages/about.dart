@@ -247,41 +247,85 @@ class _EditProfile extends State<EditProfile> {
               width: MediaQuery.of(context).size.width,
               height: 120,
               child: MaterialButton(
-                child: Text("Change phone number request"),
+                child: Text("Change phone number request",
+                    style: TextStyle(
+                      color: Colors.white,
+                    )),
+                color: OTPColour.dark1,
                 onPressed: () {
                   showDialog(
                       context: context,
-                      builder: (context) => SimpleDialog(
+                      builder: (context) => AlertDialog(
                             title: Text("Change phone number request"),
-                            children: [
-                              Padding(
-                                  padding: EdgeInsets.only(left: 10, right: 10),
-                                  child: Text(
-                                      "Please provide old phone number and the new number will be used for login, our customer service will handle your request as soon as possible.")),
-                              Padding(
-                                padding: EdgeInsets.all(10),
-                                child: TextField(
-                                  controller: _npwdInputCtrl["oldNum"],
-                                  decoration: InputDecoration(
-                                      hintText: "Old phone number"),
-                                  inputFormatters: [
-                                    FilteringTextInputFormatter.digitsOnly
-                                  ],
+                            content: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Padding(
+                                    padding:
+                                        EdgeInsets.only(left: 10, right: 10),
+                                    child: Text(
+                                        "Please provide old phone number and the new number will be used for login, our customer service will handle your request as soon as possible.")),
+                                Padding(
+                                  padding: EdgeInsets.all(10),
+                                  child: TextField(
+                                    controller: _npwdInputCtrl["oldNum"],
+                                    decoration: InputDecoration(
+                                        hintText: "Old phone number"),
+                                    inputFormatters: [
+                                      FilteringTextInputFormatter.digitsOnly
+                                    ],
+                                  ),
                                 ),
-                              ),
-                              Padding(
-                                padding: EdgeInsets.all(10),
-                                child: TextField(
-                                  controller: _npwdInputCtrl["newNum"],
-                                  decoration: InputDecoration(
-                                      hintText: "New phone number"),
-                                  inputFormatters: [
-                                    FilteringTextInputFormatter.digitsOnly
-                                  ],
-                                ),
-                              )
+                                Padding(
+                                  padding: EdgeInsets.all(10),
+                                  child: TextField(
+                                    controller: _npwdInputCtrl["newNum"],
+                                    decoration: InputDecoration(
+                                        hintText: "New phone number"),
+                                    inputFormatters: [
+                                      FilteringTextInputFormatter.digitsOnly
+                                    ],
+                                  ),
+                                )
+                              ],
+                            ),
+                            actions: [
+                              TextButton(
+                                  onPressed: () {
+                                    Navigator.pop(context, false);
+                                  },
+                                  child: Text("Cancel",
+                                      style: TextStyle(
+                                        color: Colors.red,
+                                      ))),
+                              TextButton(
+                                  onPressed: () {
+                                    Navigator.pop(context, true);
+                                  },
+                                  child: Text("Submit")),
                             ],
-                          ));
+                          )).then((doChange) {
+                    if (doChange) {
+                      showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                                title:
+                                    Text("Your phone changing request is sent"),
+                                content: Text(
+                                  "We will send a SMS to confirm the new phone number is yours",
+                                  textAlign: TextAlign.center,
+                                ),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    },
+                                    child: Text("OK"),
+                                  )
+                                ],
+                              ));
+                    }
+                  });
                 },
               ))
           /*
